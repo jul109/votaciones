@@ -1,0 +1,12 @@
+<state>
+  <timestamp value='1748009507217' />
+  <sourceSet name='default'>
+    <source name='/home/swarch/voting_system/VotingSystem.ice'>
+      <file name='/home/swarch/voting_system/centralSystem/build/generated-src/Voting/Printer.java' />
+      <file name='/home/swarch/voting_system/centralSystem/build/generated-src/Voting/PrinterPrx.java' />
+      <file name='/home/swarch/voting_system/centralSystem/build/generated-src/Voting/_PrinterPrxI.java' />
+    </source>
+    <arg value='/opt/Ice-3.7.9/bin/slice2java' />
+    <arg value='-I/opt/Ice-3.7.9/slice' />
+  </sourceSet>
+</state>
