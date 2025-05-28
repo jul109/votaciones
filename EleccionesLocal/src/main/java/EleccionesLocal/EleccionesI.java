@@ -3,17 +3,13 @@ package EleccionesLocal;
 import Votacion.*;
 import com.zeroc.Ice.Current;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class EleccionesI implements Elecciones {
-    private Connection conn;
+    private final Connection conn;
 
-    public EleccionesI() throws Exception {
-        String url = "jdbc:postgresql://localhost:5432/eleccionesdb";
-        String user = "postgres";
-        String password = "postgres"; // Reemplaza con tu contraseña
-        conn = DriverManager.getConnection(url, user, password);
+    public EleccionesI(Connection conn) {
+        this.conn = conn;
     }
 
     @Override
@@ -22,12 +18,7 @@ public class EleccionesI implements Elecciones {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM candidatos")) {
             while (rs.next()) {
-                Candidato c = new Candidato(
-                    rs.getInt("id"),
-                    rs.getString("nombre"),
-                    rs.getString("partido")
-                );
-                candidatos.add(c);
+                candidatos.add(new Candidato(rs.getInt("id"), rs.getString("nombre"), rs.getString("partido")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -37,8 +28,7 @@ public class EleccionesI implements Elecciones {
 
     @Override
     public void registrarVoto(int idCandidato, int idMesa, Current current) {
-        try (PreparedStatement ps = conn.prepareStatement(
-            "INSERT INTO votos (id_candidato, id_mesa) VALUES (?, ?)")) {
+        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO votos (id_candidato, id_mesa) VALUES (?, ?)")) {
             ps.setInt(1, idCandidato);
             ps.setInt(2, idMesa);
             ps.executeUpdate();
@@ -47,3 +37,4 @@ public class EleccionesI implements Elecciones {
         }
     }
 }
+
