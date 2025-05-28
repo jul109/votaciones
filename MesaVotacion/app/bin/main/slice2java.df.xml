@@ -1,0 +1,19 @@
+<state>
+  <timestamp value='1748455251657' />
+  <sourceSet name='default'>
+    <source name='/home/julio/repos/votaciones/MesaVotacion/app/Elecciones.ice'>
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/Candidato.java' />
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/Resultado.java' />
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/Elecciones.java' />
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/Replicador.java' />
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/CandidatosListHelper.java' />
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/ResultadosListHelper.java' />
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/EleccionesPrx.java' />
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/_EleccionesPrxI.java' />
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/ReplicadorPrx.java' />
+      <file name='/home/julio/repos/votaciones/MesaVotacion/app/build/generated-src/Votacion/_ReplicadorPrxI.java' />
+    </source>
+    <arg value='/usr/bin/slice2java' />
+    <arg value='-I/usr/share/ice/slice' />
+  </sourceSet>
+</state>

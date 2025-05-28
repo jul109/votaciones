@@ -35,3 +35,8 @@ application {
     // Define the main class for the application.
     mainClass = 'MesaVotacion.MesaVotacion'
 }
+
+run {
+    standardInput = System.in
+}
+
