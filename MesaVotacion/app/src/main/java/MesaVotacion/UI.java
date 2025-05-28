@@ -16,8 +16,7 @@ public class UI {
             controlador.inicializarConexion();
             
         } catch (Exception e) {
-            System.out.println("Error No se puede iniciar conexion con el Servidor");
-            return;
+            System.out.println("Error No se puede iniciar conexion con el Servidor. Las funcionalidades son limitadas");
         }
         
         while (true) {
@@ -30,6 +29,16 @@ public class UI {
             scanner.nextLine(); 
 
             switch (opcion) {
+                case 0:
+                    System.out.println("Enviando votos pendientes al servidor");
+                    try {
+                        controlador.inicializarConexion();
+                        controlador.enviarVotosPendientesAlServidor(); 
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                    
                 case 1:
                     votar();
                     break;
@@ -40,6 +49,7 @@ public class UI {
                     System.out.println("Opción inválida.");
             }
         }
+        
     }
 
     private void mostrarCandidatos(Votacion.Candidato[] candidatos) {
@@ -51,6 +61,7 @@ public class UI {
     }
 
     private void votar() {
+        System.out.println("Escriba su ID ");
         Votacion.Candidato[] candidatos = null;
         try {
             candidatos = controlador.obtenerCandidatos();
@@ -63,21 +74,27 @@ public class UI {
             System.out.println("No hay candidatos disponibles para votar.");
             return;
         }
-        mostrarCandidatos(candidatos);
+        
         votarConCandidatos(candidatos);
     }
 
     private void votarConCandidatos(Votacion.Candidato[] candidatos) {
-
-        System.out.print("Ingrese el ID de la mesa: ");
-        int mesaId = scanner.nextInt();
+        System.out.println("Ingrese su ID");
+        String id=scanner.next();
+        if(controlador.validarHaVotado(id)){
+            System.out.println("Usted ya voto");
+            return;
+        }
+        mostrarCandidatos(candidatos);
+        int mesaId = 1;
         System.out.print("Ingrese el ID del candidato: ");
         int candidatoId = scanner.nextInt();
         scanner.nextLine();
-
         try {
-            controlador.votar(mesaId, candidatoId);
-            System.out.println("Voto registrado correctamente.");
+            controlador.votar(id,mesaId, candidatoId);
+            System.out.println("Voto registrado localmente de forma exitosa");
+            controlador.enviarVotosPendientesAlServidor();
+
         } catch (Exception e) {
             System.out.println("Error al registrar el voto: " + e.getMessage());
         }
