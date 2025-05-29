@@ -16,12 +16,23 @@ public class Controlador {
 
     public void inicializarConexion() throws Exception {
         try {
+            /*
             communicator = com.zeroc.Ice.Util.initialize();
             com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("Elecciones:default -h x206m02 -p 10009");
             elecciones = Votacion.EleccionesPrx.checkedCast(base);
             if (elecciones == null) {
                 throw new Exception(
                         "No se pudo obtener el proxy de Elecciones. Verifica la conexión y el nombre del proxy.");
+            }
+             */
+
+            String[] args = {};
+            communicator = Ice.Util.initialize(args, "config.client");
+
+            ObjectPrx base = communicator.stringToProxy("elecciones:default -t 15000");
+            eleccionesProxy = EleccionesPrxHelper.checkedCast(base);
+            if (eleccionesProxy == null) {
+                throw new Exception("No se pudo obtener el proxy para 'elecciones'");
             }
         } catch (Exception e) {
             throw new Exception("Error al inicializar la conexión con el servidor ICE: " + e.getMessage(), e);

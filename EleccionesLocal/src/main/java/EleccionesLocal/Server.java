@@ -9,7 +9,10 @@ public class Server {
         int status = 0;
         try (Communicator communicator = Util.initialize(args)) {
 
-            ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("EleccionesAdapter", "default -p 10009");
+            //ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("EleccionesAdapter", "default -p 10009");
+
+            ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("EleccionesAdapter-0", "tcp -h x206m02 -p 10009");
+
 
             // Conexión a la base de datos local
             java.sql.Connection conn = DriverManager.getConnection(

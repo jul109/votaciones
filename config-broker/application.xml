@@ -1,0 +1,23 @@
+<!-- Copyright (c) ZeroC, Inc. All rights reserved. -->
+
+<icegrid>
+  <application name="Votaciones">
+
+    <!-- Grupo replicado con balanceo round-robin -->
+    <replica-group id="EleccionesGroup" load-balancing="round-robin">
+      <object identity="elecciones" type="::Votacion::Elecciones"/>
+    </replica-group>
+
+    <!-- Nodo ejecutándose en x206m02 -->
+    <node name="node-x206m02">
+
+      <server id="EleccionesLocal-0" exe="java" activation="on-demand">
+        <option>-jar</option>
+        <option>{{JAR_PATH}}</option>
+        <adapter name="EleccionesAdapter-0" endpoints="tcp -h x206m02" replica-group="EleccionesGroup"/>
+      </server>
+
+    </node>
+
+  </application>
+</icegrid>
