@@ -27,11 +27,11 @@ public class Controlador {
              */
 
             String[] args = {};
-            communicator = Ice.Util.initialize(args, "config.client");
+            communicator = com.zeroc.Ice.Util.initialize(args, "config.client");
 
-            ObjectPrx base = communicator.stringToProxy("elecciones:default -t 15000");
-            eleccionesProxy = EleccionesPrxHelper.checkedCast(base);
-            if (eleccionesProxy == null) {
+            com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("elecciones:default -t 15000");
+            elecciones = Votacion.EleccionesPrx.checkedCast(base);
+            if (elecciones == null) {
                 throw new Exception("No se pudo obtener el proxy para 'elecciones'");
             }
         } catch (Exception e) {

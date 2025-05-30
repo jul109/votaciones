@@ -11,7 +11,7 @@ public class Server {
 
             //ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("EleccionesAdapter", "default -p 10009");
 
-            ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("EleccionesAdapter-0", "tcp -h x206m02 -p 10009");
+            ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("EleccionesAdapter-0", "tcp -h 206m02 -p 10009");
 
 
             // Conexión a la base de datos local

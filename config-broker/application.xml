@@ -12,9 +12,10 @@
     <node name="node-x206m02">
 
       <server id="EleccionesLocal-0" exe="java" activation="on-demand">
-        <option>-jar</option>
-        <option>{{JAR_PATH}}</option>
-        <adapter name="EleccionesAdapter-0" endpoints="tcp -h x206m02" replica-group="EleccionesGroup"/>
+        <option>-cp</option>
+        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar</option>
+        <option>{{JAR_PATH}}/EleccionesLocal.jar</option>
+        <adapter name="EleccionesAdapter-0" endpoints="tcp -h 206m02 -p 10009" replica-group="EleccionesGroup"/>
       </server>
 
     </node>
