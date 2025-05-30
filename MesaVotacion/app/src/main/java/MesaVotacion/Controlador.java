@@ -2,6 +2,7 @@ package MesaVotacion;
 
 import java.io.IOException;
 import java.util.List;
+import com.zeroc.IceGrid.*;
 
 public class Controlador {
     private com.zeroc.Ice.Communicator communicator;
@@ -28,9 +29,17 @@ public class Controlador {
 
             String[] args = {};
             communicator = com.zeroc.Ice.Util.initialize(args, "config.client");
+            System.out.println("conectando con el broker");
 
-            com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("elecciones:default -t 15000");
-            elecciones = Votacion.EleccionesPrx.checkedCast(base);
+            com.zeroc.Ice.ObjectPrx base = communicator.propertyToProxy("Ice.Default.Locator");
+            System.out.println("Proxy de Elecciones obtenido");
+
+            QueryPrx query = QueryPrx.checkedCast(base);
+            System.out.println("Proxy de Query casteado correctamente");
+
+            elecciones = Votacion.EleccionesPrx.checkedCast(query.findObjectByType("::Votacion::Elecciones"));
+            System.out.println("Proxy de Elecciones casteado correctamente");
+
             if (elecciones == null) {
                 throw new Exception("No se pudo obtener el proxy para 'elecciones'");
             }
