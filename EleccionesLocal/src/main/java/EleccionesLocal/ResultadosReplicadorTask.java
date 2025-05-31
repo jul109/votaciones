@@ -44,7 +44,7 @@ public class ResultadosReplicadorTask extends Thread {
                 }
 
                 Thread.sleep(5000);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 e.printStackTrace();
             }
         }
