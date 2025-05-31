@@ -3,20 +3,33 @@
 <icegrid>
   <application name="Votaciones">
 
-    <!-- Grupo replicado con balanceo round-robin -->
+    <!--
     <replica-group id="EleccionesGroup">
       <load-balancing type="round-robin"/>
-      <object identity="elecciones" type="::Votacion::Elecciones"/>
+      <object identity="votaciones" type="::Votacion::Elecciones"/>
     </replica-group>
+    -->
 
     <node name="node-104m12">
 
       <server id="EleccionesLocal-0" exe="java" activation="on-demand">
         <option>-cp</option>
+        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/EleccionesLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>
+        <option>EleccionesLocal.Server</option>
+        <adapter name="EleccionesAdapter" endpoints="tcp -p 10009">
+          <object identity="votaciones" type="::Votacion::Elecciones" property="Identity"/>
+        </adapter>
+      </server>
+
+      <!--
+      <server id="EleccionesLocal-0" exe="java" activation="on-demand">
+        <option>-cp</option>
         <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/EleccionesLocal.jar</option>
         <option>EleccionesLocal.Server</option>
-        <adapter name="EleccionesAdapter-0" endpoints="tcp -p 10009" replica-group="EleccionesGroup"/>
+        <adapter name="EleccionesAdapter" endpoints="tcp -p 10009" replica-group="EleccionesGroup"/>
+        <property name="Identity" value="1"/>
       </server>
+      -->
 
     </node>
 

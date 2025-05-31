@@ -11,7 +11,7 @@ public class Server {
 
             //ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("EleccionesAdapter", "default -p 10009");
 
-            ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("EleccionesAdapter-0", "tcp -p 10009");
+            ObjectAdapter adapter = communicator.createObjectAdapter("EleccionesAdapter");
 
 
             // Conexión a la base de datos local
@@ -20,7 +20,11 @@ public class Server {
 
             // Crear e iniciar el servicio Elecciones
             EleccionesI eleccionesServant = new EleccionesI(conn);
-            adapter.add(eleccionesServant, Util.stringToIdentity("Elecciones"));
+
+            com.zeroc.Ice.Properties properties = communicator.getProperties();
+            com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(properties.getProperty("Identity"));
+
+            adapter.add(eleccionesServant, id);
             adapter.activate();
 
             System.out.println("🗳️ Servidor Elecciones Local activo en el puerto 10009...");

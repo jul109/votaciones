@@ -2,7 +2,7 @@
 
 JAR_PATH="$1"
 TEMPLATE="application.xml"
-OUTPUT="icegird_gen.xml"
+OUTPUT="icegrid_gen.xml"
 
 if [ -f "$OUTPUT" ]; then
     read -p "$OUTPUT ya existe. ¿Deseás sobrescribirlo? (s/N): " confirm

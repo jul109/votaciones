@@ -31,7 +31,7 @@ public class Controlador {
             communicator = com.zeroc.Ice.Util.initialize(args, "config.client");
             System.out.println("conectando con el broker");
 
-            com.zeroc.Ice.ObjectPrx base = communicator.propertyToProxy("Ice.Default.Locator");
+            com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("DemoIceGrid/Query");
             System.out.println("Proxy de Elecciones obtenido");
 
             QueryPrx query = QueryPrx.checkedCast(base);
@@ -44,6 +44,7 @@ public class Controlador {
                 throw new Exception("No se pudo obtener el proxy para 'elecciones'");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new Exception("Error al inicializar la conexión con el servidor ICE: " + e.getMessage(), e);
         }
     }
