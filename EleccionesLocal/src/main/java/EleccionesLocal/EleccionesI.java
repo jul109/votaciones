@@ -28,14 +28,25 @@ public class EleccionesI implements Elecciones {
 
     @Override
     public void registrarVoto(int idCandidato, int idMesa, Current current) {
-        System.out.println("Registrando voto: Candidato ID " + idCandidato + ", Mesa ID " + idMesa);
-        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO votos (id_candidato, id_mesa, fecha) VALUES (?, ?, current_timestamp)")) {
-            ps.setInt(1, idCandidato);
-            ps.setInt(2, idMesa);
-            ps.executeUpdate();
+        try {
+            String id = UUID.randomUUID().toString();
+
+            PreparedStatement ps1 = conn.prepareStatement(
+                "INSERT INTO votos (id_candidato, id_mesa, fecha) VALUES (?, ?, current_timestamp)");
+            ps1.setInt(1, idCandidato);
+            ps1.setInt(2, idMesa);
+            ps1.executeUpdate();
+
+            PreparedStatement ps2 = conn.prepareStatement(
+                "INSERT INTO votos_pendientes (id, id_candidato, id_mesa, enviado) VALUES (?, ?, ?, false)");
+            ps2.setString(1, id);
+            ps2.setInt(2, idCandidato);
+            ps2.setInt(3, idMesa);
+            ps2.executeUpdate();
+
+            System.out.println("🗳️ Voto registrado en votos_pendientes: " + id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 }
-

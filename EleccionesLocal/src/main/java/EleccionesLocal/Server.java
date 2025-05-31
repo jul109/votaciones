@@ -2,6 +2,7 @@ package EleccionesLocal;
 
 import com.zeroc.Ice.*;
 import Votacion.*;
+import votacionRM.*;
 import java.sql.*;
 
 public class Server {
@@ -9,32 +10,36 @@ public class Server {
         int status = 0;
         try (Communicator communicator = Util.initialize(args)) {
 
-            //ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("EleccionesAdapter", "default -p 10009");
-
+            // Adapter para Elecciones
             ObjectAdapter adapter = communicator.createObjectAdapter("EleccionesAdapter");
-
-
-            // Conexión a la base de datos local
             java.sql.Connection conn = DriverManager.getConnection(
                 "jdbc:postgresql://localhost:5432/eleccionesdb", "postgres", "postgres");
 
-            // Crear e iniciar el servicio Elecciones
             EleccionesI eleccionesServant = new EleccionesI(conn);
-
-            com.zeroc.Ice.Properties properties = communicator.getProperties();
-            com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(properties.getProperty("Identity"));
-
+            Properties properties = communicator.getProperties();
+            Identity id = Util.stringToIdentity(properties.getProperty("Identity"));
             adapter.add(eleccionesServant, id);
             adapter.activate();
 
-            System.out.println("🗳️ Servidor Elecciones Local activo en el puerto 10009...");
+            System.out.println("🗳️ Elecciones Local iniciado...");
 
-            // Conexión con el centralizador de votos nacional
-            ObjectPrx base = communicator.stringToProxy("Replicador:default -h 192.168.131.110 -p 10010");
-            ReplicadorPrx replicador = ReplicadorPrx.checkedCast(base);
+            // Reliable Messaging setup
+            ObjectAdapter rmAdapter = communicator.createObjectAdapterWithEndpoints("RMAdapter", "default -p 10011");
 
-            // Iniciar hilo de envío periódico de resultados
-            new ResultadosReplicadorTask(conn, replicador).start();
+            // ACK local
+            ACKVotoServiceI ackServant = new ACKVotoServiceI(conn);
+            rmAdapter.add(ackServant, Util.stringToIdentity("ACKService"));
+            rmAdapter.activate();
+
+            // Proxy remoto
+            ObjectPrx remote = communicator.stringToProxy("CentralizadorRM:default -h 192.168.131.110 -p 10012");
+            CentralizadorRMPrx centralizadorRM = CentralizadorRMPrx.checkedCast(remote);
+
+            // Proxy local a ACK
+            ObjectPrx ackBase = rmAdapter.createProxy(Util.stringToIdentity("ACKService"));
+            ACKVotoServicePrx ackProxy = ACKVotoServicePrx.checkedCast(ackBase);
+
+            new RMReplicador(conn, centralizadorRM, ackProxy).start();
 
             communicator.waitForShutdown();
 
@@ -46,4 +51,3 @@ public class Server {
         System.exit(status);
     }
 }
-
