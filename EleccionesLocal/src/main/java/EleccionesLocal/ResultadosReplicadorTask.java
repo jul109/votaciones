@@ -8,10 +8,12 @@ import java.util.*;
 public class ResultadosReplicadorTask extends Thread {
     private final java.sql.Connection conn;
     private final ReplicadorPrx replicador;
+    private Timestamp ultimoEnvio;
 
     public ResultadosReplicadorTask(java.sql.Connection conn, ReplicadorPrx replicador) {
         this.conn = conn;
         this.replicador = replicador;
+        this.ultimoEnvio = new Timestamp(System.currentTimeMillis());
     }
 
     @Override
@@ -19,20 +21,32 @@ public class ResultadosReplicadorTask extends Thread {
         while (true) {
             try {
                 List<Resultado> resultados = new ArrayList<>();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT id_candidato, COUNT(*) as votos FROM votos GROUP BY id_candidato");
+
+                // Agrupar solo votos nuevos desde la última vez
+                PreparedStatement ps = conn.prepareStatement(
+                    "SELECT id_candidato, COUNT(*) as votos FROM votos " +
+                    "WHERE fecha > ? GROUP BY id_candidato"
+                );
+                ps.setTimestamp(1, ultimoEnvio);
+                ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {
-                    Resultado r = new Resultado(rs.getInt("id_candidato"), rs.getInt("votos"));
-                    resultados.add(r);
+                    resultados.add(new Resultado(
+                        rs.getInt("id_candidato"),
+                        rs.getInt("votos")
+                    ));
                 }
 
-                replicador.recibirResultados(resultados.toArray(new Resultado[0]));
+                // Solo enviar si hay algo nuevo
+                if (!resultados.isEmpty()) {
+                    replicador.recibirResultados(resultados.toArray(new Resultado[0]));
+                    ultimoEnvio = new Timestamp(System.currentTimeMillis());
+                }
+
                 Thread.sleep(5000);
-            } catch (java.lang.Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 }
-
