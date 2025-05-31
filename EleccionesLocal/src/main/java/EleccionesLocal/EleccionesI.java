@@ -28,6 +28,7 @@ public class EleccionesI implements Elecciones {
 
     @Override
     public void registrarVoto(int idCandidato, int idMesa, Current current) {
+        System.out.println("Registrando voto: Candidato ID " + idCandidato + ", Mesa ID " + idMesa);
         try (PreparedStatement ps = conn.prepareStatement("INSERT INTO votos (id_candidato, id_mesa) VALUES (?, ?)")) {
             ps.setInt(1, idCandidato);
             ps.setInt(2, idMesa);

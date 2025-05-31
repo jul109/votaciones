@@ -124,8 +124,8 @@ public class Controlador {
 
         for (VotoPendiente voto : pendientes) {
             try {
-                System.out.println("Enviando voto ID: " + voto.getId() + " (Mesa: " + voto.getMesaId() + ")");
-                elecciones.registrarVoto(voto.getMesaId(), voto.getCandidatoId()); // Llamada al servidor Ice
+                System.out.println("Enviando voto ID: " + voto.getId() + " (Mesa: " + voto.getMesaId() + ")" + ", " + "Candidato: " + voto.getCandidatoId() + ")");
+                elecciones.registrarVoto(voto.getCandidatoId(), voto.getMesaId()); // Llamada al servidor Ice
                 System.out.println("Voto ID: " + voto.getId() + " enviado con éxito al servidor.");
 
                 // Si el envío fue exitoso, eliminarlo de la lista local
