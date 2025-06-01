@@ -93,7 +93,7 @@ public class UI {
         try {
             controlador.votar(id,mesaId, candidatoId);
             System.out.println("Voto registrado localmente de forma exitosa");
-            controlador.enviarVotosPendientesAlServidor();
+            
 
         } catch (Exception e) {
             System.out.println("Error al registrar el voto: " + e.getMessage());

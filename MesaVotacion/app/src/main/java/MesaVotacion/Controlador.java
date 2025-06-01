@@ -10,6 +10,21 @@ public class Controlador {
     private CsvManager csvManager;
     private Votacion.Candidato[] candidatosCache;
 
+
+    // Variables para comunicación confiable
+    private votacionRM.CentralizadorRMPrx centralizadorRM;
+    private ACKVotoServiceI ackService;
+    private votacionRM.ACKVotoServicePrx ackProxy;
+    private VotosRMTask votosRMTask;
+
+    // Cadena del proxy para el CentralizadorRM del Servidor Local (necesaria para el VotosRMTask)
+    private final String CENTRALIZADOR_LOCAL_PROXY_STRING = "CentralizadorRM_Mesa:tcp -h 192.168.131.112 -p 10017";
+    // Puerto donde la Mesa escuchará los ACKs (necesaria para el Adapter)
+    private final String ACK_ADAPTER_ENDPOINT = "default -p 10014";
+    // Identidad del servicio ACK de la Mesa (necesaria para el Adapter y el Proxy local)
+    private final String ACK_SERVICE_IDENTITY = "ACKVotoService_Mesa";
+
+
     public Controlador() {
         this.csvManager = new CsvManager(); // Inicializar CsvManager
         this.candidatosCache = null;
@@ -40,14 +55,81 @@ public class Controlador {
             elecciones = Votacion.EleccionesPrx.checkedCast(query.findObjectByType("::Votacion::Elecciones"));
             System.out.println("Proxy de Elecciones casteado correctamente");
 
+
+
+
             if (elecciones == null) {
                 throw new Exception("No se pudo obtener el proxy para 'elecciones'");
             }
+            System.out.println("Iniciando comunicacion confiable");
+            inicializarComunicacionConfiable();
+            
+
+
+
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Error al inicializar la conexión con el servidor ICE: " + e.getMessage(), e);
         }
     }
+
+
+
+    
+    public void inicializarComunicacionConfiable() throws Exception {
+        try {
+            System.out.println("Inicializando comunicación confiable...");
+
+            
+            com.zeroc.Ice.ObjectPrx baseCentralizador = communicator.stringToProxy(CENTRALIZADOR_LOCAL_PROXY_STRING);
+            centralizadorRM = votacionRM.CentralizadorRMPrx.checkedCast(baseCentralizador);
+
+            if (centralizadorRM == null) {
+                throw new Exception("No se pudo conectar al CentralizadorRM en el Servidor Local. Verifique la IP, puerto y que el servicio esté activo.");
+            }
+            System.out.println("✅ Conectado al Servidor Local (CentralizadorRM_Mesa).");
+
+            
+            ackService = new ACKVotoServiceI(csvManager);
+
+            
+            com.zeroc.Ice.ObjectAdapter ackAdapter = communicator.createObjectAdapterWithEndpoints("ACKAdapter", ACK_ADAPTER_ENDPOINT);
+
+            
+            ackAdapter.add(ackService, com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
+
+            
+            ackAdapter.activate();
+            System.out.println("Mesa de Votación escuchando ACKs en el puerto " + ACK_ADAPTER_ENDPOINT.split("-p ")[1] + ".");
+
+           
+            com.zeroc.Ice.ObjectPrx ackBase = ackAdapter.createProxy(com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
+            ackProxy = votacionRM.ACKVotoServicePrx.checkedCast(ackBase);
+
+            if (ackProxy == null) {
+                throw new Exception("No se pudo crear el proxy ACK local. Verifique la identidad '" + ACK_SERVICE_IDENTITY + "'.");
+            }
+            System.out.println("Proxy local de ACK creado.");
+
+           
+            votosRMTask = new VotosRMTask(csvManager, centralizadorRM, ackProxy, communicator, CENTRALIZADOR_LOCAL_PROXY_STRING,this);
+            votosRMTask.start();
+
+            System.out.println("Comunicación confiable inicializada exitosamente.");
+
+
+        } catch (com.zeroc.Ice.LocalException iceEx) {
+            System.err.println("Error de comunicación Ice al inicializar (Comunicación Confiable): " + iceEx.getMessage());
+            iceEx.printStackTrace();
+            throw iceEx; // Relanzar para que el método llamador (inicializarConexion) lo maneje
+        } catch (Exception rmEx) {
+            System.err.println(" Error general al inicializar comunicación confiable: " + rmEx.getMessage());
+            rmEx.printStackTrace();
+            throw rmEx; // Relanzar
+        }
+    }
+
 
     public Votacion.Candidato[] obtenerCandidatos() throws Exception {
         if (candidatosCache != null) {
