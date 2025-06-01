@@ -7,7 +7,7 @@ import java.sql.*;
 
 public class Server {
 
-        // ...existing code...
+        // PENDING
 
         private static void inicializarRecepcionConfiableMesaServer(Communicator communicator, java.sql.Connection conn) throws java.lang.Exception {
         System.out.println("🔗 Inicializando recepción confiable desde Mesa de Votación...");
@@ -24,7 +24,7 @@ public class Server {
         System.out.println("✅ Recepción confiable lista - Puerto 10017");
     }
 
-// ...existing code...
+
     public static void main(String[] args) {
         int status = 0;
         try (Communicator communicator = Util.initialize(args)) {
