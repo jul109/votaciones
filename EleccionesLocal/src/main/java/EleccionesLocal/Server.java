@@ -22,6 +22,7 @@ public class Server {
             adapter.activate();
 
             System.out.println("🗳️ Elecciones Local iniciado...");
+            System.out.println("1.5");
 
             // Reliable Messaging setup
             ObjectAdapter rmAdapter = communicator.createObjectAdapterWithEndpoints("RMAdapter", "default -p 10011");
@@ -33,7 +34,7 @@ public class Server {
 
             // Servant para recibir votos confiables desde la Mesa de Votación
             CentralizadorRMImpl centralizadorRMServant = new CentralizadorRMImpl(conn);
-            rmAdapter.add(centralizadorRMServant, Util.stringToIdentity("CentralizadorRM"));
+            rmAdapter.add(centralizadorRMServant, Util.stringToIdentity("CentralizadorRM_Mesa"));
 
             // Proxy remoto
             ObjectPrx remote = communicator.stringToProxy("CentralizadorRM:default -h 192.168.131.110 -p 10012");
