@@ -2,7 +2,7 @@
 
 <div id="user-content-toc">
   <ul align="center">
-    <summary><h1 style="display: inline-block"><a href="https://github.com/Electromayonaise">Martín Gómez</a>, <a href="https://github.com/jul109">Julio Prado</a>, <a href="https://github.com/MateorR">Mateo Rubio</a></h1></summary>
+    <summary><h1 style="display: inline-block"><a href="https://github.com/Electromayonaise">Martín Gómez</a>, <a href="https://github.com/jul109">Julio Prado</a>, <a href="https://github.com/MateoRAR">Mateo Rubio</a></h1></summary>
   </ul>
 </div>
 
