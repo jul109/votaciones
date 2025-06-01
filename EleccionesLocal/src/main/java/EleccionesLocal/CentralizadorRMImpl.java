@@ -17,6 +17,9 @@ public class CentralizadorRMImpl implements CentralizadorRM {
         try {
             // Generar un id localmente, igual que en EleccionesI
             String id = voto.id != null ? voto.id : java.util.UUID.randomUUID().toString();
+            System.out.println("LINEA 20 AQUI ESTOY ");
+            ack.ack(id);
+            System.out.println("LINEA 22 AQUI ESTOY ");
 
             // Insertar en la tabla votos (registro histórico)
             PreparedStatement ps1 = conn.prepareStatement(
@@ -33,10 +36,12 @@ public class CentralizadorRMImpl implements CentralizadorRM {
             ps2.setInt(3, voto.idMesa);
             ps2.executeUpdate();
 
-            ack.ack(id);
+            
             System.out.println("✅ Voto confiable recibido y registrado en EleccionesLocal: " + id);
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally{
+            
         }
     }
 }

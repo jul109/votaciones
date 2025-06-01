@@ -1,14 +1,27 @@
 EleccionesLocal/ResultadosReplicadorTask.java
  EleccionesLocal.ResultadosReplicadorTask
+votacionRM/Voto.java
+ votacionRM.Voto
+Votacion/ResultadosListHelper.java
+ Votacion.ResultadosListHelper
 Votacion/Elecciones.java
  Votacion.Elecciones
  Votacion.Elecciones$1
-Votacion/ResultadosListHelper.java
- Votacion.ResultadosListHelper
 Votacion/_EleccionesPrxI.java
  Votacion._EleccionesPrxI
+votacionRM/_CentralizadorRMPrxI.java
+ votacionRM._CentralizadorRMPrxI
 Votacion/Resultado.java
  Votacion.Resultado
+EleccionesLocal/CentralizadorRMImpl.java
+ EleccionesLocal.CentralizadorRMImpl
+EleccionesLocal/RMReplicador.java
+ EleccionesLocal.RMReplicador
+votacionRM/ACKVotoService.java
+ votacionRM.ACKVotoService
+ votacionRM.ACKVotoService$1
+votacionRM/_ACKVotoServicePrxI.java
+ votacionRM._ACKVotoServicePrxI
 EleccionesLocal/EleccionesI.java
  EleccionesLocal.EleccionesI
 Votacion/_ReplicadorPrxI.java
@@ -16,13 +29,24 @@ Votacion/_ReplicadorPrxI.java
 Votacion/Replicador.java
  Votacion.Replicador
  Votacion.Replicador$1
+votacionRM/ListaVotosHelper.java
+ votacionRM.ListaVotosHelper
 Votacion/ReplicadorPrx.java
  Votacion.ReplicadorPrx
 EleccionesLocal/Server.java
  EleccionesLocal.Server
-Votacion/Candidato.java
- Votacion.Candidato
+votacionRM/ACKVotoServicePrx.java
+ votacionRM.ACKVotoServicePrx
 Votacion/CandidatosListHelper.java
  Votacion.CandidatosListHelper
+Votacion/Candidato.java
+ Votacion.Candidato
+EleccionesLocal/ACKVotoServiceI.java
+ EleccionesLocal.ACKVotoServiceI
+votacionRM/CentralizadorRMPrx.java
+ votacionRM.CentralizadorRMPrx
+votacionRM/CentralizadorRM.java
+ votacionRM.CentralizadorRM
+ votacionRM.CentralizadorRM$1
 Votacion/EleccionesPrx.java
  Votacion.EleccionesPrx

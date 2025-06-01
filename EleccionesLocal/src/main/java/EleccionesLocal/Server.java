@@ -6,6 +6,25 @@ import votacionRM.*;
 import java.sql.*;
 
 public class Server {
+
+        // ...existing code...
+
+        private static void inicializarRecepcionConfiableMesaServer(Communicator communicator, java.sql.Connection conn) throws java.lang.Exception {
+        System.out.println("🔗 Inicializando recepción confiable desde Mesa de Votación...");
+        
+        // Adapter para recibir votos confiables - NOMBRE DIFERENTE
+        ObjectAdapter mesaAdapter = communicator.createObjectAdapterWithEndpoints("MesaAdapter", "tcp -h 192.168.131.112 -p 10017");
+
+        // Servant para recibir votos confiables desde la Mesa de Votación
+        CentralizadorRMImpl centralizadorRMServant = new CentralizadorRMImpl(conn);
+        mesaAdapter.add(centralizadorRMServant, Util.stringToIdentity("CentralizadorRM_Mesa"));
+        
+        mesaAdapter.activate();
+        
+        System.out.println("✅ Recepción confiable lista - Puerto 10017");
+    }
+
+// ...existing code...
     public static void main(String[] args) {
         int status = 0;
         try (Communicator communicator = Util.initialize(args)) {
@@ -32,9 +51,8 @@ public class Server {
             rmAdapter.add(ackServant, Util.stringToIdentity("ACKService"));
             rmAdapter.activate();
 
-            // Servant para recibir votos confiables desde la Mesa de Votación
-            CentralizadorRMImpl centralizadorRMServant = new CentralizadorRMImpl(conn);
-            rmAdapter.add(centralizadorRMServant, Util.stringToIdentity("CentralizadorRM_Mesa"));
+            inicializarRecepcionConfiableMesaServer(communicator, conn);
+            
 
             // Proxy remoto
             ObjectPrx remote = communicator.stringToProxy("CentralizadorRM:default -h 192.168.131.110 -p 10012");
