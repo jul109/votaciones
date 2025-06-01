@@ -31,6 +31,10 @@ public class Server {
             rmAdapter.add(ackServant, Util.stringToIdentity("ACKService"));
             rmAdapter.activate();
 
+            // Servant para recibir votos confiables desde la Mesa de Votación
+            CentralizadorRMImpl centralizadorRMServant = new CentralizadorRMImpl(conn);
+            rmAdapter.add(centralizadorRMServant, Util.stringToIdentity("CentralizadorRM"));
+
             // Proxy remoto
             ObjectPrx remote = communicator.stringToProxy("CentralizadorRM:default -h 192.168.131.110 -p 10012");
             CentralizadorRMPrx centralizadorRM = CentralizadorRMPrx.checkedCast(remote);
