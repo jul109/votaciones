@@ -1,24 +1,25 @@
 <!-- Copyright (c) ZeroC, Inc. All rights reserved. -->
-
 <icegrid>
 
-  <application name="Simple">
+  <application name="Votaciones">
 
-    <server-template id="SimpleServer">
+    <server-template id="EleccionesLocal">
       <parameter name="index"/>
-      <server id="SimpleServer-${index}" exe="java" activation="on-demand">
-        <option>-jar</option>
-        <option>../server/build/libs/server.jar</option>
-        <adapter name="Hello" endpoints="tcp -h localhost">
-          <object identity="hello-${index}" type="::Demo::Hello" property="Identity"/>
+      <server id="EleccionesLocal-${index}" exe="java" activation="on-demand">
+        <option>-cp</option>
+        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/EleccionesLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>
+        <option>EleccionesLocal.Server</option>
+        <adapter name="EleccionesAdapter" endpoints="tcp -p 10009">
+          <object identity="votaciones" type="::Votacion::Elecciones" property="Identity"/>
         </adapter>
+        <property name="Identity" value="${index}"/>
       </server>
     </server-template>
 
-    <node name="node1">
-      <server-instance template="SimpleServer" index="1"/>
-      <server-instance template="SimpleServer" index="2"/>
-      <server-instance template="SimpleServer" index="3"/>
+    <node name="node-104m12">
+      <server-instance template="EleccionesLocal" index="0"/>
+      <server-instance template="EleccionesLocal" index="1"/>
+      <server-instance template="EleccionesLocal" index="2"/>
     </node>
 
   </application>
