@@ -1,0 +1,12 @@
+<state>
+  <timestamp value='1749775524839' />
+  <sourceSet name='default'>
+    <source name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/DispositivoCiudadano/src/main/consultas.ice'>
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/DispositivoCiudadano/src/main/generated/consultaVotacion/queryStation.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/DispositivoCiudadano/src/main/generated/consultaVotacion/queryStationPrx.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/DispositivoCiudadano/src/main/generated/consultaVotacion/_queryStationPrxI.java' />
+    </source>
+    <arg value='/usr/bin/slice2java' />
+    <arg value='-I/usr/share/ice/slice' />
+  </sourceSet>
+</state>
