@@ -1,7 +1,5 @@
 <!-- Copyright (c) ZeroC, Inc. All rights reserved. -->
 
-<icegrid>
-  <application name="Votaciones">
 
     <!--
     <replica-group id="EleccionesGroup">
@@ -9,6 +7,20 @@
       <object identity="votaciones" type="::Votacion::Elecciones"/>
     </replica-group>
     -->
+
+
+      <!--
+      <server id="EleccionesLocal-0" exe="java" activation="on-demand">
+        <option>-cp</option>
+        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/EleccionesLocal.jar</option>
+        <option>EleccionesLocal.Server</option>
+        <adapter name="EleccionesAdapter" endpoints="tcp -p 10009" replica-group="EleccionesGroup"/>
+        <property name="Identity" value="1"/>
+      </server>
+      -->
+
+<icegrid>
+  <application name="Votaciones">
 
     <node name="node-104m12">
 
@@ -21,16 +33,17 @@
         </adapter>
       </server>
 
-      <!--
-      <server id="EleccionesLocal-0" exe="java" activation="on-demand">
-        <option>-cp</option>
-        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/EleccionesLocal.jar</option>
-        <option>EleccionesLocal.Server</option>
-        <adapter name="EleccionesAdapter" endpoints="tcp -p 10009" replica-group="EleccionesGroup"/>
-        <property name="Identity" value="1"/>
-      </server>
-      -->
+    </node>
 
+    <node name="node-206m02">
+      <server id="MesaVotacionLocal-0" exe="java" activation="on-demand">
+        <option>-cp</option>
+        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/MesaVotacionLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>
+        <option>consultaVotacion.QueryStationServer</option>
+        <adapter name="MesaLocalAdapter" endpoints="tcp -p 10027">
+          <object identity="consultaVotacion" type="::consultaVotacion::queryStation" property="Identity"/>
+        </adapter>
+      </server>
     </node>
 
   </application>

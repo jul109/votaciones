@@ -10,7 +10,7 @@ public class DatabaseManager {
 
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/votaciones";
     private static final String USER = "postgres";
-    private static final String PASS = "1212";
+    private static final String PASS = "postgres";
 
     private Connection connection;
 
@@ -24,13 +24,20 @@ public class DatabaseManager {
     }
 
     public String queryVoter(String document) {
-        String query = "SELECT mesa_id FROM ciudadano WHERE documento = ?";
+        String query = "SELECT mesa_id, puesto_id, nombre_puesto, direccion, municipio, departamento " +
+                      "FROM ciudadano_detalle WHERE documento = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, document);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return rs.getString("mesa_id");
+                return String.format("Mesa: %s\nPuesto: %s\nNombre del Puesto: %s\nDirección: %s\nMunicipio: %s\nDepartamento: %s",
+                    rs.getString("mesa_id"),
+                    rs.getString("puesto_id"),
+                    rs.getString("nombre_puesto"),
+                    rs.getString("direccion"),
+                    rs.getString("municipio"),
+                    rs.getString("departamento"));
             } else {
                 return "No se encontró el documento en la base de datos";
             }
