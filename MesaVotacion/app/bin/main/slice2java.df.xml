@@ -1,5 +1,5 @@
 <state>
-  <timestamp value='1748725430014' />
+  <timestamp value='1749932962588' />
   <sourceSet name='default'>
     <source name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/Elecciones.ice'>
       <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/Votacion/Candidato.java' />
@@ -12,6 +12,21 @@
       <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/Votacion/_EleccionesPrxI.java' />
       <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/Votacion/ReplicadorPrx.java' />
       <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/Votacion/_ReplicadorPrxI.java' />
+    </source>
+    <source name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/ReliableVoto.ice'>
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/votacionRM/Voto.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/votacionRM/ACKVotoService.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/votacionRM/CentralizadorRM.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/votacionRM/ListaVotosHelper.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/votacionRM/ACKVotoServicePrx.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/votacionRM/_ACKVotoServicePrxI.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/votacionRM/CentralizadorRMPrx.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/votacionRM/_CentralizadorRMPrxI.java' />
+    </source>
+    <source name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/consultas.ice'>
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/consultaVotacion/queryStation.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/consultaVotacion/queryStationPrx.java' />
+      <file name='/mnt/c/Users/mateo/Desktop/Universidad/semeste_6/Ingesoft_4/votaciones/MesaVotacion/app/build/generated-src/consultaVotacion/_queryStationPrxI.java' />
     </source>
     <arg value='/usr/bin/slice2java' />
     <arg value='-I/usr/share/ice/slice' />

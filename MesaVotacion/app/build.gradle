@@ -27,7 +27,7 @@ dependencies {
 }
 slice {
     java {
-        files = [file('Elecciones.ice'), file('ReliableVoto.ice')]
+        files = [file('Elecciones.ice'), file('ReliableVoto.ice'), file('consultas.ice')]
     }
 }
 

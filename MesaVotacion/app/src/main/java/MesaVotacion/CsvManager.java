@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.io.*;
 
 public class CsvManager {
 
@@ -180,6 +181,21 @@ public class CsvManager {
     public Set<Votante> getPersonasQueVotaron() {
         synchronized (personasQueVotaron) {
             return new HashSet<>(personasQueVotaron);
+        }
+    }
+
+    public void crearCsvCiudadanos(String fileName, String[] ciudadanos) throws IOException {
+        try (FileWriter writer = new FileWriter(fileName);
+             BufferedWriter bw = new BufferedWriter(writer);
+             PrintWriter out = new PrintWriter(bw)) {
+            
+            // Escribir encabezado
+            out.println("Documento");
+            
+            // Escribir cada ciudadano
+            for (String ciudadano : ciudadanos) {
+                out.println(ciudadano);
+            }
         }
     }
 }

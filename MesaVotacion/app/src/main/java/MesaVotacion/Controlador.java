@@ -5,12 +5,14 @@ import java.util.List;
 import com.zeroc.IceGrid.*;
 import com.zeroc.Ice.*;
 import votacionRM.*;
+import consultaVotacion.*;
 
 public class Controlador {
     private com.zeroc.Ice.Communicator communicator;
     private Votacion.EleccionesPrx elecciones;
     private CsvManager csvManager;
     private Votacion.Candidato[] candidatosCache;
+    private consultaVotacion.queryStationPrx queryStation;
 
     // Variables para comunicación confiable
     private votacionRM.CentralizadorRMPrx centralizadorRM;
@@ -18,9 +20,8 @@ public class Controlador {
     private votacionRM.ACKVotoServicePrx ackProxy;
     private VotosRMTask votosRMTask;
 
-    // Puerto donde la Mesa escuchará los ACKs (necesaria para el Adapter)
+
     private final String ACK_ADAPTER_ENDPOINT = "default -p 10014";
-    // Identidad del servicio ACK de la Mesa (necesaria para el Adapter y el Proxy local)
     private final String ACK_SERVICE_IDENTITY = "ACKVotoService_Mesa";
 
     public Controlador() {
@@ -42,6 +43,13 @@ public class Controlador {
 
             elecciones = Votacion.EleccionesPrx.checkedCast(query.findObjectByType("::Votacion::Elecciones"));
             System.out.println("Proxy de Elecciones casteado correctamente");
+
+            // Obtener el proxy para el servicio de consulta de mesa local
+            queryStation = consultaVotacion.queryStationPrx.checkedCast(query.findObjectByType("::consultaVotacion::queryStation"));
+            if (queryStation == null) {
+                throw new java.lang.Exception("No se pudo obtener el proxy para 'queryStation'");
+            }
+            System.out.println("Proxy de QueryStation obtenido correctamente");
 
             if (elecciones == null) {
                 throw new java.lang.Exception("No se pudo obtener el proxy para 'elecciones'");
@@ -209,6 +217,32 @@ public class Controlador {
             } catch (java.lang.Exception e) {
                 System.err.println("Error al cerrar la conexión ICE: " + e.getMessage());
             }
+        }
+    }
+
+    public void obtenerCiudadanosMesa(String mesaId) throws java.lang.Exception {
+        if (queryStation == null) {
+            throw new java.lang.Exception("La conexión con el servicio de consulta no está inicializada.");
+        }
+
+        try {
+            System.out.println("Obteniendo ciudadanos para la mesa: " + mesaId);
+            String[] ciudadanos = queryStation.obtenerCiudadanos(mesaId);
+            
+            if (ciudadanos != null && ciudadanos.length > 0) {
+                // Crear archivo CSV con los ciudadanos
+                String csvFileName = "ciudadanos_mesa_" + mesaId + ".csv";
+                csvManager.crearCsvCiudadanos(csvFileName, ciudadanos);
+                System.out.println("Archivo CSV creado exitosamente: " + csvFileName);
+            } else {
+                System.out.println("No se encontraron ciudadanos para la mesa: " + mesaId);
+            }
+        } catch (com.zeroc.Ice.Exception iceEx) {
+            System.err.println("Error de ICE al obtener ciudadanos: " + iceEx.getMessage());
+            throw new java.lang.Exception("Error al obtener ciudadanos: " + iceEx.getMessage(), iceEx);
+        } catch (IOException e) {
+            System.err.println("Error al crear archivo CSV: " + e.getMessage());
+            throw new java.lang.Exception("Error al crear archivo CSV: " + e.getMessage(), e);
         }
     }
 }

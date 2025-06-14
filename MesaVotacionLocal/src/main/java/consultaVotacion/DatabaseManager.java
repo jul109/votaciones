@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseManager {
 
@@ -31,19 +33,37 @@ public class DatabaseManager {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return String.format("Mesa: %s\nPuesto: %s\nNombre del Puesto: %s\nDirección: %s\nMunicipio: %s\nDepartamento: %s",
-                    rs.getString("mesa_id"),
-                    rs.getString("puesto_id"),
+                return String.format("\"%s\" ubicado en \"%s\" en \"%s\", \"%s\" en la mesa \"%s\"",
                     rs.getString("nombre_puesto"),
                     rs.getString("direccion"),
                     rs.getString("municipio"),
-                    rs.getString("departamento"));
+                    rs.getString("departamento"),
+                    rs.getString("mesa_id"));
             } else {
-                return "No se encontró el documento en la base de datos";
+                return null;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error querying database: " + e.getMessage());
         }
+    }
+
+    public String[] obtenerCiudadanos(String mesaId) {
+        String query = "SELECT documento FROM ciudadano WHERE mesa_id = ?";
+        List<String> ciudadanos = new ArrayList<>();
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, mesaId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String ciudadano = rs.getString("documento");
+                ciudadanos.add(ciudadano);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying ciudadanos: " + e.getMessage());
+        }
+
+        return ciudadanos.toArray(new String[0]);
     }
 
     public void close() {

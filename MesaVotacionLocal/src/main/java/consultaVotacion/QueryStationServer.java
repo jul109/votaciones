@@ -57,11 +57,28 @@ class queryStationI implements queryStation {
         System.out.println("Consulta recibida para documento: " + document);
         try {
             String result = dbManager.queryVoter(document);
+            if (result == null) {
+                System.out.println("Documento no encontrado: " + document);
+                return "No está registrado";
+            }
             System.out.println("Resultado de la consulta: " + result + "\n\n");
             return result;
         } catch (Exception e) {
             System.err.println("Error procesando consulta: " + e.getMessage());
             throw new RuntimeException("Error procesando consulta: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String[] obtenerCiudadanos(String mesaId, Current current) {
+        System.out.println("Consulta recibida para obtener ciudadanos de la mesa: " + mesaId);
+        try {
+            String[] result = dbManager.obtenerCiudadanos(mesaId);
+            System.out.println("Se encontraron " + result.length + " ciudadanos para la mesa " + mesaId);
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error obteniendo ciudadanos: " + e.getMessage());
+            throw new RuntimeException("Error obteniendo ciudadanos: " + e.getMessage());
         }
     }
 }

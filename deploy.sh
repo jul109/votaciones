@@ -21,6 +21,10 @@ cd ../DispositivoCiudadano
 echo "Compilando DispositivoCiudadano..."
 gradle clean build installDist
 
+cd ../CentralizadorDeVotosNacional
+echo "Compilando CentralizadorDeVotosNacional..."
+gradle clean build installDist
+
 # Volver al directorio base
 cd ..
 
@@ -32,6 +36,9 @@ scp EleccionesLocal/build/libs/EleccionesLocal.jar swarch@x206m03:~/LosPelados/d
 echo "Enviando app.jar..."
 scp MesaVotacion/app/build/libs/app.jar swarch@x206m03:~/LosPelados/deploy
 
+echo "Enviando id.mesa..."
+scp MesaVotacion/app/id.mesa swarch@x206m03:~/LosPelados/deploy
+
 echo "Enviando MesaVotacionLocal.jar..."
 scp MesaVotacionLocal/build/libs/MesaVotacionLocal.jar swarch@x206m03:~/LosPelados/deploy
 
@@ -41,5 +48,8 @@ scp DispositivoCiudadano/build/libs/DispositivoCiudadano.jar swarch@x206m04:~/Lo
 # Copiar config-broker al servidor remoto
 echo "Enviando config-broker/..."
 scp -r config-broker/ swarch@x206m03:~/LosPelados/deploy
+
+echo "Enviando Centralizador"
+scp CentralizadorDeVotosNacional/build/libs/Centralizador.jar swarch@x206m03:~/LosPelados/deploy
 
 echo "✅ Todo listo."

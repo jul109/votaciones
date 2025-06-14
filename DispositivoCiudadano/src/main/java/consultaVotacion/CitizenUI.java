@@ -25,7 +25,7 @@ public class CitizenUI {
 
                 try {
                     String response = controller.queryDocument(input);
-                    System.out.println("Respuesta del servidor: " + response + "\n\n");
+                    System.out.println("Usted debe votar en " + response + "\n\n");
                 } catch (Exception e) {
                     System.err.println("Error al consultar: " + e.getMessage());
                 }

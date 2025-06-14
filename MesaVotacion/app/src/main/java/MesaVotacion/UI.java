@@ -34,8 +34,14 @@ public class UI {
         try {
             controlador.inicializarConexion();
 
+            try {
+                controlador.obtenerCiudadanosMesa(String.valueOf(MESA_ID));
+            } catch (Exception e) {
+                System.out.println("Error al obtener ciudadanos de la mesa: " + e.getMessage());
+            }
+
         } catch (Exception e) {
-            System.out.println("Error No se puede iniciar conexion con el Servidor. Las funcionalidades son limitadas");
+            System.out.println("Error No se puede iniciar conexion con el Servidor. Las funcionalidades son limitadas" + e.getMessage());
         }
 
         while (true) {
