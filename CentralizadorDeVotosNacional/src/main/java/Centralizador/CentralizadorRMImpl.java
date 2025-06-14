@@ -54,9 +54,9 @@ public class CentralizadorRMImpl implements CentralizadorRM {
     }
 
     private void generarResumenGeneral() throws SQLException, IOException {
-        String query = "SELECT id_candidato, c.nombre AS nombre, COUNT(*) AS total " +
+        String query = "SELECT v.id_candidato, c.nombre, COUNT(*) as total " +
                     "FROM votos_recibidos v JOIN candidatos c ON v.id_candidato = c.id " +
-                    "GROUP BY id_candidato, c.nombre";
+                    "GROUP BY v.id_candidato, c.nombre";
 
         try (Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(query);
@@ -76,7 +76,7 @@ public class CentralizadorRMImpl implements CentralizadorRM {
 
             while (rsMesas.next()) {
                 int mesaId = rsMesas.getInt("id_mesa");
-                String query = "SELECT id_candidato, c.nombre AS nombre, COUNT(*) AS total " +
+                String query = "SELECT id_candidato, c.nombre, COUNT(*) AS total " +
                             "FROM votos_recibidos v JOIN candidatos c ON v.id_candidato = c.id " +
                             "WHERE id_mesa = ? GROUP BY id_candidato, c.nombre";
 

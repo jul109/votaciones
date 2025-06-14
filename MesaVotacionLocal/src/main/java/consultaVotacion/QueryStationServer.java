@@ -70,12 +70,24 @@ class queryStationI implements queryStation {
     }
 
     @Override
-    public String[] obtenerCiudadanos(String mesaId, Current current) {
+    public String[] obtenerCiudadanos(int mesaId, Current current) {
         System.out.println("Consulta recibida para obtener ciudadanos de la mesa: " + mesaId);
         try {
+            if (mesaId <= 0) {
+                throw new IllegalArgumentException("El ID de la mesa debe ser un número positivo");
+            }
+
             String[] result = dbManager.obtenerCiudadanos(mesaId);
+            if (result == null) {
+                System.out.println("No se encontraron ciudadanos para la mesa: " + mesaId);
+                return new String[0]; // Retornar array vacío en lugar de null
+            }
+            
             System.out.println("Se encontraron " + result.length + " ciudadanos para la mesa " + mesaId);
             return result;
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error de validación: " + e.getMessage());
+            throw new RuntimeException("Error de validación: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Error obteniendo ciudadanos: " + e.getMessage());
             throw new RuntimeException("Error obteniendo ciudadanos: " + e.getMessage());

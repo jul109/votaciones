@@ -4,6 +4,6 @@ module consultaVotacion {
 
     interface queryStation{
        string query(string document);
-       CiudadanosList obtenerCiudadanos(string mesaId);
+       CiudadanosList obtenerCiudadanos(int mesaId);
     };
 }; 

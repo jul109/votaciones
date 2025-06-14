@@ -33,7 +33,7 @@ public class DatabaseManager {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return String.format("\"%s\" ubicado en \"%s\" en \"%s\", \"%s\" en la mesa \"%s\"",
+                return String.format("Usted debe votar en \"%s\" ubicado en \"%s\" en \"%s\", \"%s\" en la mesa \"%s\"",
                     rs.getString("nombre_puesto"),
                     rs.getString("direccion"),
                     rs.getString("municipio"),
@@ -47,23 +47,33 @@ public class DatabaseManager {
         }
     }
 
-    public String[] obtenerCiudadanos(String mesaId) {
-        String query = "SELECT documento FROM ciudadano WHERE mesa_id = ?";
+    public String[] obtenerCiudadanos(int mesaId) {
+        String query = "SELECT documento FROM ciudadano WHERE mesa_id = ? ORDER BY documento";
         List<String> ciudadanos = new ArrayList<>();
         
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, mesaId);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                String ciudadano = rs.getString("documento");
-                ciudadanos.add(ciudadano);
+            pstmt.setInt(1, mesaId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String documento = rs.getString("documento");
+                    if (documento != null && !documento.trim().isEmpty()) {
+                        ciudadanos.add(documento.trim());
+                    }
+                }
             }
+            
+            if (ciudadanos.isEmpty()) {
+                System.out.println("No se encontraron ciudadanos para la mesa: " + mesaId);
+                return new String[0];
+            }
+            
+            System.out.println("Se encontraron " + ciudadanos.size() + " ciudadanos para la mesa " + mesaId);
+            return ciudadanos.toArray(new String[0]);
+            
         } catch (SQLException e) {
-            throw new RuntimeException("Error querying ciudadanos: " + e.getMessage());
+            System.err.println("Error consultando ciudadanos: " + e.getMessage());
+            throw new RuntimeException("Error consultando ciudadanos: " + e.getMessage(), e);
         }
-
-        return ciudadanos.toArray(new String[0]);
     }
 
     public void close() {

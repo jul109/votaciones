@@ -36,7 +36,7 @@ public class Server {
 
             communicator.waitForShutdown();
 
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             e.printStackTrace();
         }
     }

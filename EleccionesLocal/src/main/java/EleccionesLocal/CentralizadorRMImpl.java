@@ -13,7 +13,7 @@ public class CentralizadorRMImpl implements CentralizadorRM {
 
     @Override
     public void recibirVoto(Voto voto, ACKVotoServicePrx ack, Current current) {
-        System.out.println("RECIBI VOTACION VIEJO ");
+        System.out.println("Voto recibido en EleccionesLocal");
         try {
             // Generar un id localmente, igual que en EleccionesI
             String id = voto.id != null ? voto.id : java.util.UUID.randomUUID().toString();

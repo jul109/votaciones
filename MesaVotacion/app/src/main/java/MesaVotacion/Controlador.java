@@ -220,7 +220,11 @@ public class Controlador {
         }
     }
 
-    public void obtenerCiudadanosMesa(String mesaId) throws java.lang.Exception {
+    public void obtenerCiudadanosMesa(int mesaId) throws java.lang.Exception {
+        if (mesaId <= 0) {
+            throw new IllegalArgumentException("El ID de la mesa debe ser un número positivo");
+        }
+
         if (queryStation == null) {
             throw new java.lang.Exception("La conexión con el servicio de consulta no está inicializada.");
         }
@@ -231,18 +235,28 @@ public class Controlador {
             
             if (ciudadanos != null && ciudadanos.length > 0) {
                 // Crear archivo CSV con los ciudadanos
-                String csvFileName = "ciudadanos_mesa_" + mesaId + ".csv";
-                csvManager.crearCsvCiudadanos(csvFileName, ciudadanos);
-                System.out.println("Archivo CSV creado exitosamente: " + csvFileName);
+                String csvFileName = "ciudadanos_mesa.csv";
+
+                try {
+                    csvManager.crearCsvCiudadanos(csvFileName, ciudadanos);
+                    System.out.println("✅ Archivo CSV creado exitosamente: " + csvFileName);
+                } catch (IOException e) {
+                    System.err.println("❌ Error al crear archivo CSV: " + e.getMessage());
+                    throw new java.lang.Exception("Error al crear archivo CSV: " + e.getMessage(), e);
+                }
             } else {
-                System.out.println("No se encontraron ciudadanos para la mesa: " + mesaId);
+                System.out.println("ℹ️ No se encontraron ciudadanos para la mesa: " + mesaId);
             }
+
         } catch (com.zeroc.Ice.Exception iceEx) {
-            System.err.println("Error de ICE al obtener ciudadanos: " + iceEx.getMessage());
+            System.err.println("❌ Error de ICE al obtener ciudadanos: " + iceEx.getMessage());
             throw new java.lang.Exception("Error al obtener ciudadanos: " + iceEx.getMessage(), iceEx);
-        } catch (IOException e) {
-            System.err.println("Error al crear archivo CSV: " + e.getMessage());
-            throw new java.lang.Exception("Error al crear archivo CSV: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            System.err.println("❌ Error de validación: " + e.getMessage());
+            throw e;
+        } catch (java.lang.Exception e) {
+            System.err.println("❌ Error inesperado: " + e.getMessage());
+            throw e;
         }
     }
 }

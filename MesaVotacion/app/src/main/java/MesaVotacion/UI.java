@@ -35,7 +35,7 @@ public class UI {
             controlador.inicializarConexion();
 
             try {
-                controlador.obtenerCiudadanosMesa(String.valueOf(MESA_ID));
+                controlador.obtenerCiudadanosMesa(MESA_ID);
             } catch (Exception e) {
                 System.out.println("Error al obtener ciudadanos de la mesa: " + e.getMessage());
             }
