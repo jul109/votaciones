@@ -6,6 +6,7 @@ import com.zeroc.IceGrid.*;
 import com.zeroc.Ice.*;
 import votacionRM.*;
 import consultaVotacion.*;
+import VotacionTest.*;
 
 public class Controlador {
     private com.zeroc.Ice.Communicator communicator;
@@ -19,6 +20,12 @@ public class Controlador {
     private ACKVotoServiceI ackService;
     private votacionRM.ACKVotoServicePrx ackProxy;
     private VotosRMTask votosRMTask;
+
+    //Variables para exponer tests de ote station
+    private VoteStationImp voteStationServant; // Tu servant
+    private ObjectAdapter voteStationAdapter;
+    private final String VOTE_STATION_ADAPTER_ENDPOINT = "default -p 10015";
+    private final String VOTE_STATION_IDENTITY = "VoteStation_Mesa";
 
 
     private final String ACK_ADAPTER_ENDPOINT = "default -p 10014";
@@ -56,6 +63,7 @@ public class Controlador {
             }
             System.out.println("Iniciando comunicacion confiable");
             inicializarComunicacionConfiable();
+            exponerServicioVoteStation();
 
         } catch (java.lang.Exception e) {
             e.printStackTrace();
@@ -258,5 +266,21 @@ public class Controlador {
             System.err.println("❌ Error inesperado: " + e.getMessage());
             throw e;
         }
+    }
+
+
+    public void exponerServicioVoteStation() throws java.lang.Exception {
+        if (communicator == null ) {
+            throw new IllegalStateException("ICE communicator is not initialized or is destroyed.");
+        }
+
+        System.out.println("Exposing VoteStation service...");
+        voteStationAdapter = communicator.createObjectAdapterWithEndpoints(
+            "VoteStationAdapter", VOTE_STATION_ADAPTER_ENDPOINT);
+        this.voteStationServant=new VoteStationImp();
+        voteStationAdapter.add(this.voteStationServant, Util.stringToIdentity(VOTE_STATION_IDENTITY));
+        
+        voteStationAdapter.activate(); 
+        System.out.println("VoteStation service exposed on port " + VOTE_STATION_ADAPTER_ENDPOINT.split("-p ")[1] + " with identity '" + VOTE_STATION_IDENTITY + "'.");
     }
 }
