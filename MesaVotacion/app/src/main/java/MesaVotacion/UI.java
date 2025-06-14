@@ -1,24 +1,43 @@
 package MesaVotacion;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class UI {
     private Controlador controlador;
     private Scanner scanner;
+    private static final String MESA_ID_FILE = "id.mesa";
+    private static int MESA_ID;
 
     public UI(Controlador controlador) {
         this.controlador = controlador;
+
         this.scanner = new Scanner(System.in);
+
+        try {
+            MESA_ID = leerMesaIdDesdeArchivo();
+            System.out.println("ID de Mesa cargado: " + MESA_ID);
+        } catch (IOException e) {
+            System.out.println(
+                    "Error crítico: No se pudo leer el ID de la mesa desde '" + MESA_ID_FILE + "'. " + e.getMessage());
+            MESA_ID = -1;
+        } catch (NumberFormatException e) {
+            System.out.println("Error crítico: El contenido del archivo '" + MESA_ID_FILE + "' no es un número válido. "
+                    + e.getMessage());
+            MESA_ID = -1;
+        }
     }
 
     public void menu() {
         try {
             controlador.inicializarConexion();
-            
+
         } catch (Exception e) {
             System.out.println("Error No se puede iniciar conexion con el Servidor. Las funcionalidades son limitadas");
         }
-        
+
         while (true) {
             System.out.println("\n--- Menú ---");
             System.out.println("1. Votar");
@@ -26,7 +45,7 @@ public class UI {
             System.out.print("Seleccione una opción: \n");
 
             int opcion = scanner.nextInt();
-            scanner.nextLine(); 
+            scanner.nextLine();
 
             switch (opcion) {
                 case 1:
@@ -39,7 +58,7 @@ public class UI {
                     System.out.println("Opción inválida.");
             }
         }
-        
+
     }
 
     private void mostrarCandidatos(Votacion.Candidato[] candidatos) {
@@ -64,14 +83,14 @@ public class UI {
             System.out.println("No hay candidatos disponibles para votar.");
             return;
         }
-        
+
         votarConCandidatos(candidatos);
     }
 
     private void votarConCandidatos(Votacion.Candidato[] candidatos) {
         System.out.println("Ingrese su ID");
-        String id=scanner.next();
-        if(controlador.validarHaVotado(id)){
+        String id = scanner.next();
+        if (controlador.validarHaVotado(id)) {
             System.out.println("Usted ya voto");
             return;
         }
@@ -81,13 +100,26 @@ public class UI {
         int candidatoId = scanner.nextInt();
         scanner.nextLine();
         try {
-            controlador.votar(id,mesaId, candidatoId);
+            controlador.votar(id, mesaId, candidatoId);
             System.out.println("Voto registrado localmente de forma exitosa");
-            
 
         } catch (Exception e) {
             System.out.println("Error al registrar el voto: " + e.getMessage());
         }
+    }
+
+    private static int leerMesaIdDesdeArchivo() throws IOException, NumberFormatException {
+        int mesaId = -1;
+        try (BufferedReader reader = new BufferedReader(new FileReader(MESA_ID_FILE))) {
+            String line = reader.readLine();
+            if (line != null) {
+                mesaId = Integer.parseInt(line.trim()); // Converts the line to an integer
+            } else {
+
+                throw new IOException("El archivo '" + MESA_ID_FILE + "' está vacío.");
+            }
+        }
+        return mesaId;
     }
 
 }
