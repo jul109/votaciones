@@ -24,20 +24,20 @@
 
     <node name="node-104m12">
 
-      <server id="EleccionesLocal-0" exe="java" activation="on-demand">
+      <server id="EleccionesLocal-0" exe="java" activation="always">
         <option>-cp</option>
         <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/EleccionesLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>
         <option>EleccionesLocal.Server</option>
         <adapter name="EleccionesAdapter" endpoints="tcp -p 10009">
-          <object identity="votaciones" type="::Votacion::Elecciones" property="Identity"/>
-          <object identity="ReliableVotacion" type="::votacionRM::CentralizadorRM" property="Identity"/>
+          <object identity="votaciones" type="::Votacion::Elecciones" property="IdentityVotaciones"/>
+          <object identity="ReliableVotacion" type="::votacionRM::CentralizadorRM" property="IdentityReliable"/>
         </adapter>
       </server>
 
     </node>
 
     <node name="node-104m14">
-      <server id="MesaVotacionLocal-0" exe="java" activation="on-demand">
+      <server id="MesaVotacionLocal-0" exe="java" activation="always">
         <option>-cp</option>
         <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/MesaVotacionLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>
         <option>consultaVotacion.QueryStationServer</option>

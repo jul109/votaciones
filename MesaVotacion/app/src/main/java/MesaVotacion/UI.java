@@ -23,22 +23,12 @@ public class UI {
             System.out.println("\n--- Menú ---");
             System.out.println("1. Votar");
             System.out.println("2. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.print("Seleccione una opción: \n");
 
             int opcion = scanner.nextInt();
             scanner.nextLine(); 
 
             switch (opcion) {
-                case 0:
-                    System.out.println("Enviando votos pendientes al servidor");
-                    try {
-                        controlador.inicializarConexion();
-                        controlador.enviarVotosPendientesAlServidor(); 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                    
                 case 1:
                     votar();
                     break;
@@ -87,7 +77,7 @@ public class UI {
         }
         mostrarCandidatos(candidatos);
         int mesaId = 1;
-        System.out.print("Ingrese el ID del candidato: ");
+        System.out.print("Ingrese el ID del candidato: \n");
         int candidatoId = scanner.nextInt();
         scanner.nextLine();
         try {

@@ -7,38 +7,35 @@ import java.sql.*;
 
 public class Server {
 
-        // PENDING
-
-        private static void inicializarRecepcionConfiableMesaServer(Communicator communicator, java.sql.Connection conn) throws java.lang.Exception {
-        System.out.println("🔗 Inicializando recepción confiable desde Mesa de Votación...");
-        
-        // Adapter para recibir votos confiables - NOMBRE DIFERENTE
-        ObjectAdapter mesaAdapter = communicator.createObjectAdapterWithEndpoints("MesaAdapter", "tcp -h 192.168.131.112 -p 10017");
-
-        // Servant para recibir votos confiables desde la Mesa de Votación
-        CentralizadorRMImpl centralizadorRMServant = new CentralizadorRMImpl(conn);
-        mesaAdapter.add(centralizadorRMServant, Util.stringToIdentity("CentralizadorRM_Mesa"));
-        
-        mesaAdapter.activate();
-        
-        System.out.println("✅ Recepción confiable lista - Puerto 10017");
-    }
-
 
     public static void main(String[] args) {
         int status = 0;
         try (Communicator communicator = Util.initialize(args)) {
-
-            // Adapter para Elecciones
-            ObjectAdapter adapter = communicator.createObjectAdapter("EleccionesAdapter");
             java.sql.Connection conn = DriverManager.getConnection(
                 "jdbc:postgresql://localhost:5432/eleccionesdb", "postgres", "postgres");
 
-            EleccionesI eleccionesServant = new EleccionesI(conn);
+
+            ObjectAdapter mesaAdapter = communicator.createObjectAdapter("EleccionesAdapter");
+
+            // Obtener propiedades
             Properties properties = communicator.getProperties();
-            Identity id = Util.stringToIdentity(properties.getProperty("Identity"));
-            adapter.add(eleccionesServant, id);
-            adapter.activate();
+            
+            // Crear e insertar CentralizadorRM
+            CentralizadorRMImpl centralizadorRMServant = new CentralizadorRMImpl(conn);
+            Identity idCentralizador = Util.stringToIdentity(properties.getProperty("IdentityReliable"));
+            mesaAdapter.add(centralizadorRMServant, idCentralizador);
+            
+            // Crear e insertar Elecciones
+            EleccionesI eleccionesServant = new EleccionesI(conn);
+            Identity idElecciones = Util.stringToIdentity(properties.getProperty("IdentityVotaciones"));
+            mesaAdapter.add(eleccionesServant, idElecciones);
+            
+            // Activar adaptador
+            mesaAdapter.activate();
+
+
+
+
 
             System.out.println("🗳️ Elecciones Local iniciado...");
             System.out.println("1.5");
@@ -51,7 +48,7 @@ public class Server {
             rmAdapter.add(ackServant, Util.stringToIdentity("ACKService"));
             rmAdapter.activate();
 
-            inicializarRecepcionConfiableMesaServer(communicator, conn);
+
             
 
             // Proxy remoto

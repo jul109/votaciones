@@ -10,16 +10,34 @@
         <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/EleccionesLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>
         <option>EleccionesLocal.Server</option>
         <adapter name="EleccionesAdapter" endpoints="tcp -p 10009">
-          <object identity="votaciones" type="::Votacion::Elecciones" property="Identity"/>
+          <object identity="votaciones" type="::Votacion::Elecciones" property="IdentityVotaciones"/>
+          <object identity="ReliableVotacion" type="::votacionRM::CentralizadorRM" property="IdentityReliable"/>
         </adapter>
         <property name="Identity" value="${index}"/>
       </server>
     </server-template>
 
+    <server-template id="MesaVotacionLocal" exe="java" activation="on-demand">
+      <parameter name="index"/>
+      <server id="MesaVotacionLocal-${index}" exe="java" activation="on-demand">
+        <option>-cp</option>
+        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/MesaVotacionLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>
+        <option>consultaVotacion.QueryStationServer</option>
+        <adapter name="MesaLocalAdapter" endpoints="tcp -p 10027">
+          <object identity="consultaVotacion" type="::consultaVotacion::queryStation" property="Identity"/>
+        </adapter>
+        <property name="Identity" value="${index}"/>
+      </server>
+    </server>
+
     <node name="node-104m12">
       <server-instance template="EleccionesLocal" index="0"/>
       <server-instance template="EleccionesLocal" index="1"/>
       <server-instance template="EleccionesLocal" index="2"/>
+    </node>
+
+    <node name="node-104m14">
+      <server-instance template="MesaVotacionLocal" index="0"/>
     </node>
 
   </application>
