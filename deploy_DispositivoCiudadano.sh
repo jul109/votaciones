@@ -1,19 +1,13 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]; then
-    echo "Uso: $0 <direccion_scp> <nombre_nodo>"
-    exit 1
-fi
-
-DESTINO=$1           
-NOMBRE_NODO=$2        
+DESTINO=$1              
 DIR_COMPACT="compact"
 
 echo "Eliminando carpeta compact..."
 rm -rf "$DIR_COMPACT"
 
 echo "Creando carpeta compact..."
-mkdir -p "$DIR_COMPACT/db/node"
+mkdir "$DIR_COMPACT"
 
 echo "Copiando DispositivoCiudadano.jar..."
 cp DispositivoCiudadano/build/libs/DispositivoCiudadano.jar "$DIR_COMPACT/"
@@ -45,4 +39,4 @@ scp -r "$DIR_COMPACT" "$DESTINO:~/LosPelados/deploy"
 echo "Eliminando carpeta compact..."
 rm -rf "$DIR_COMPACT"
 
-echo "Transferencia completada a $DESTINO con nodo $NOMBRE_NODO"
+echo "Transferencia completada a $DESTINO

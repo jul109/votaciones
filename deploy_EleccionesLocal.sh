@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Verifica que se pasaron dos parámetros
-if [ "$#" -ne 2 ]; then
-    echo "Uso: $0 <direccion_scp> <nombre_nodo>"
-    exit 1
-fi
 
 DESTINO=$1           
 NOMBRE_NODO=$2        
