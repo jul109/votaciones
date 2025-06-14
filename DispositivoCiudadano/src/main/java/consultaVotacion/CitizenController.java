@@ -5,21 +5,27 @@ import com.zeroc.Ice.ObjectPrx;
 import com.zeroc.Ice.Util;
 import com.zeroc.Ice.Exception;
 import consultaVotacion.queryStationPrx;
+import com.zeroc.IceGrid.*;
 
 public class CitizenController {
 
-    private static final String SERVER_IP = "localhost";
-    private static final int SERVER_PORT = 10000;
-    private static final String ENDPOINT = "tcp -h " + SERVER_IP + " -p " + SERVER_PORT;
-
-    private Communicator communicator;
-    private queryStationPrx queryStation;
+    private com.zeroc.Ice.Communicator communicator;
+    private consultaVotacion.queryStationPrx queryStation;
 
     public CitizenController() {
         try {
-            communicator = Util.initialize();
-            ObjectPrx base = communicator.stringToProxy("QueryStation:" + ENDPOINT);
-            queryStation = queryStationPrx.checkedCast(base);
+            String[] args = {};
+            communicator = com.zeroc.Ice.Util.initialize(args, "config.client");
+            System.out.println("conectando con el broker");
+
+            com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("DemoIceGrid/Query");
+            System.out.println("Proxy de Consulta obtenido");
+
+            QueryPrx query = QueryPrx.checkedCast(base);
+            System.out.println("Proxy de Query casteado correctamente");
+
+            queryStation = consultaVotacion.queryStationPrx.checkedCast(query.findObjectByType("::consultaVotacion::queryStation"));
+            System.out.println("Proxy de QueryStation casteado correctamente");
 
             if (queryStation == null) {
                 throw new RuntimeException("Error: Invalid proxy");

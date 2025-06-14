@@ -20,25 +20,14 @@ dependencies {
     implementation 'com.zeroc:icegrid:3.7.10'
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/java', 'src/main/generated']
-        }
-    }
-}
 
 slice {
     java {
-        output = file("src/main/generated")
         files = [file('src/main/consultas.ice')]
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.compilerArgs << '-Xlint:unchecked'
-    options.encoding = 'UTF-8'
-}
+
 
 application {
     mainClass = 'consultaVotacion.CitizenUI'

@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class DatabaseManager {
 
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/votaciones";
+    private static final String DB_URL = "jdbc:postgresql://192.168.131.22:5432/votaciones";
     private static final String USER = "postgres";
     private static final String PASS = "postgres";
 

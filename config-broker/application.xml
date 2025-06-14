@@ -30,12 +30,13 @@
         <option>EleccionesLocal.Server</option>
         <adapter name="EleccionesAdapter" endpoints="tcp -p 10009">
           <object identity="votaciones" type="::Votacion::Elecciones" property="Identity"/>
+          <object identity="ReliableVotacion" type="::votacionRM::CentralizadorRM" property="Identity"/>
         </adapter>
       </server>
 
     </node>
 
-    <node name="node-206m02">
+    <node name="node-104m14">
       <server id="MesaVotacionLocal-0" exe="java" activation="on-demand">
         <option>-cp</option>
         <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/MesaVotacionLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>

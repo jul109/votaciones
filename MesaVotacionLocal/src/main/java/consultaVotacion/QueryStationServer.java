@@ -5,13 +5,13 @@ import com.zeroc.Ice.ObjectAdapter;
 import com.zeroc.Ice.Util;
 import com.zeroc.Ice.Exception;
 import com.zeroc.Ice.Current;
-import consultaVotacion.queryStation;
-import consultaVotacion.queryStationI;
+import consultaVotacion.*;
+import com.zeroc.Ice.*;
+import com.zeroc.IceGrid.*;
+import java.sql.*;
+
 
 public class QueryStationServer {
-
-    private static final int PORT = 10000;
-    private static final String ADAPTER_NAME = "QueryStationAdapter";
 
     public static void main(String[] args) {
         try (Communicator communicator = Util.initialize(args)) {
@@ -19,18 +19,18 @@ public class QueryStationServer {
             DatabaseManager dbManager = new DatabaseManager();
 
             // Crear el adaptador de objetos
-            ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints(
-                    ADAPTER_NAME, "tcp -p " + PORT);
+            ObjectAdapter adapter = communicator.createObjectAdapter("MesaLocalAdapter");
 
             // Crear e instanciar el servidor
-            queryStation queryStationServant = new queryStationI(dbManager);
-            adapter.add(queryStationServant, Util.stringToIdentity("QueryStation"));
+            queryStationI queryStationServant = new queryStationI(dbManager);
+            Properties properties = communicator.getProperties();
+            Identity id = Util.stringToIdentity(properties.getProperty("Identity"));
+            adapter.add(queryStationServant, id);
 
             // Activar el adaptador
             adapter.activate();
 
-            System.out.println("Servidor iniciado en el puerto " + PORT);
-            System.out.println("Presione Ctrl+C para terminar...");
+            System.out.println("Servidor iniciado en el puerto 10000 ");
 
             // Mantener el servidor en ejecución
             communicator.waitForShutdown();
@@ -57,7 +57,7 @@ class queryStationI implements queryStation {
         System.out.println("Consulta recibida para documento: " + document);
         try {
             String result = dbManager.queryVoter(document);
-            System.out.println("Resultado de la consulta: " + result);
+            System.out.println("Resultado de la consulta: " + result + "\n\n");
             return result;
         } catch (Exception e) {
             System.err.println("Error procesando consulta: " + e.getMessage());

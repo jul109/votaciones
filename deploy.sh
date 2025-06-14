@@ -33,7 +33,7 @@ echo "Enviando app.jar..."
 scp MesaVotacion/app/build/libs/app.jar swarch@x206m03:~/LosPelados/deploy
 
 echo "Enviando MesaVotacionLocal.jar..."
-scp MesaVotacionLocal/build/libs/MesaVotacionLocal.jar swarch@x206m02:~/LosPelados/deploy
+scp MesaVotacionLocal/build/libs/MesaVotacionLocal.jar swarch@x206m03:~/LosPelados/deploy
 
 echo "Enviando DispositvoCiudadano.jar..."
 scp DispositivoCiudadano/build/libs/DispositivoCiudadano.jar swarch@x206m04:~/LosPelados/deploy
