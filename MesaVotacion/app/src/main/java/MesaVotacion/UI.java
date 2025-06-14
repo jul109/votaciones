@@ -95,12 +95,12 @@ public class UI {
             return;
         }
         mostrarCandidatos(candidatos);
-        int mesaId = 1;
+
         System.out.print("Ingrese el ID del candidato: \n");
         int candidatoId = scanner.nextInt();
         scanner.nextLine();
         try {
-            controlador.votar(id, mesaId, candidatoId);
+            controlador.votar(id, MESA_ID, candidatoId);
             System.out.println("Voto registrado localmente de forma exitosa");
 
         } catch (Exception e) {
