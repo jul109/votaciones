@@ -13,6 +13,8 @@ public class VoteStationImp implements VoteStation {
 
     @Override
     public int vote(String document, int candidateId, Current current) {
+        System.out.println("LLAMADO A VOTO DIRECTO DESDE VOTE STATION");
+        System.out.println("Responsabilidad delegado a controlador");
         return controlador.votarTest(document, candidateId);
     }
 }

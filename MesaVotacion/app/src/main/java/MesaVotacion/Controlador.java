@@ -35,16 +35,20 @@ public class Controlador {
     private static final String MESA_ID_FILE = "id.mesa";
     private static int MESA_ID;
 
+    //query station
+
+    
+
     public Controlador() {
         this.csvManager = new CsvManager(); // Inicializar CsvManager
         this.candidatosCache = null;
         try {
             MESA_ID = leerMesaIdDesdeArchivo();
-            
+
         } catch (java.lang.Exception e) {
             System.out.println("Error al leer mesa");
         }
-        
+
     }
 
     public void inicializarConexion() throws java.lang.Exception {
@@ -114,12 +118,30 @@ public class Controlador {
             ackAdapter.add(ackService, com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
 
             ackAdapter.activate();
-            System.out.println(
-                    "Mesa de Votación escuchando ACKs en el puerto " + ACK_ADAPTER_ENDPOINT.split("-p ")[1] + ".");
-
+            System.out.println("Mesa de Votación escuchando ACKs en el puerto " +
+                    ACK_ADAPTER_ENDPOINT.split("-p ")[1] + ".");
             com.zeroc.Ice.ObjectPrx ackBase = ackAdapter
                     .createProxy(com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
             ackProxy = votacionRM.ACKVotoServicePrx.checkedCast(ackBase);
+            // ESTO NO SIRVE
+            try {
+                // Forzar una conexión al servidor
+                centralizadorRM.ice_ping();
+
+                // Obtener la conexión activa
+                com.zeroc.Ice.Connection connection = centralizadorRM.ice_getConnection();
+                if (connection != null) {
+                    // Asociar el adaptador ACK con esta conexión
+                    connection.setAdapter(ackAdapter);
+                    System.out.println("✅ Conexión bidireccional configurada correctamente");
+                } else {
+                    System.err.println("⚠️ No se pudo obtener una conexión para configurar bidireccionalidad");
+                }
+            } catch (com.zeroc.Ice.Exception e) {
+                System.err.println("❌ Error al configurar conexión bidireccional: " + e.getMessage());
+                e.printStackTrace();
+            }
+            // ESTO NO SIRVE
 
             if (ackProxy == null) {
                 throw new java.lang.Exception(
@@ -271,6 +293,7 @@ public class Controlador {
                 try {
                     csvManager.crearCsvCiudadanos(csvFileName, ciudadanos);
                     System.out.println("✅ Archivo CSV creado exitosamente: " + csvFileName);
+                    csvManager.inicializarYcargarCiudadanos();
                 } catch (IOException e) {
                     System.err.println("❌ Error al crear archivo CSV: " + e.getMessage());
                     throw new java.lang.Exception("Error al crear archivo CSV: " + e.getMessage(), e);
@@ -308,27 +331,50 @@ public class Controlador {
     }
 
     public int votarTest(String document, int candidateId) {
-        System.out.println("Llamado a votar test");
+        System.out.println("Llamado a votar test en controlador");
         if (validarHaVotado(document)) {
             return 2; // Ya votó
         }
 
         boolean esMesaDeCiudadano = esMesa(document);
         if (!esMesaDeCiudadano) {
-            return 3; // No le corresponde esta mesa
+            boolean cedulaEstaRegistrada=cedulaEstaRegistrada(document);
+            if (!cedulaEstaRegistrada){
+                return 3;
+            }else{
+                return 1;
+            }
+            
         }
 
         try {
-            csvManager.registrarVotante(document); // Solo lo marcas si sí llegó
-            votacionRM.Voto voto = new votacionRM.Voto(document, candidateId, MESA_ID);
-            this.centralizadorRM.recibirVoto(voto, ackProxy); // bloquea hasta ACK
+            System.out.println("REGISTRANDO VOTANTE");
+            try {
+                csvManager.registrarVotante(document); // Solo lo marcas si sí llegó
+            } catch (java.lang.Exception e) {
+                e.printStackTrace();
+            }
 
+            System.out.println("VOTANTE REGISTRADO");
+            System.out.println("Creando voto...");
+            votacionRM.Voto voto = new votacionRM.Voto(document, candidateId, MESA_ID);
+            System.out.println("Voto creado...");
+
+            // Verificar si el proxy está activo
+
+            System.out.println("EN ESPERA DEL ACK......");
+
+            //this.centralizadorRM.recibirVoto(voto, ackProxy); 
+            System.out.println("ACK RECIBIDO CORRECTAMENTE");
             System.out.println(document + " votó correctamente (ID: " + MESA_ID + ").");
 
-            return 1; // Voto recibido correctamente
-        } catch (java.lang.Exception e) {
+
+            return 0; // Voto recibido correctamente
+
+        } catch (com.zeroc.Ice.Exception e) {
             System.err.println("❌ Error al enviar voto directamente: " + e.getMessage());
-            return -1; // Error de envío
+            e.printStackTrace(); // Para ver la traza completa del error
+            return -1; // Error de envío genérico
         }
     }
 
@@ -348,6 +394,14 @@ public class Controlador {
             }
         }
         return mesaId;
+    }
+
+    private boolean cedulaEstaRegistrada(String document){
+        System.out.println("VERIFICANDO SI LA CEDULA ESTA REGISTRADA....");
+        String answer=queryStation.query(document);
+        System.out.println("Verficacion completa....");
+        System.out.println(answer);
+        return !answer.equals("No está registrado");
     }
 
 }

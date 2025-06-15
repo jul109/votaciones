@@ -36,7 +36,7 @@ public class CsvManager {
         this.personasQueVotaron = Collections.synchronizedSet(new HashSet<>());
 
         cargarVotosPendientes();
-        cargarVotantes();
+        
         
         
     }
@@ -201,11 +201,11 @@ public class CsvManager {
             for (String ciudadano : ciudadanos) {
                 out.println(ciudadano);
             }
-            inicializarYcargarCiudadanos();
+            
         }
     }
 
-    private void inicializarYcargarCiudadanos() {
+    public void inicializarYcargarCiudadanos() {
         System.out.println("Cargandos ciudadanos de la mesa");
         Set<String> tempCiudadanos = Collections.synchronizedSet(new HashSet<>());
         if (Files.exists(ciudadanosFilePath)) {
@@ -233,6 +233,7 @@ public class CsvManager {
         }
         
         synchronized (ciudadanos) {
+            
             return ciudadanos.contains(id.trim());
         }
     }
