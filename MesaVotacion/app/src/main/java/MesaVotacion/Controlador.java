@@ -210,6 +210,19 @@ public class Controlador {
             throw new java.lang.Exception("La persona con ID '" + personaId + "' ya ha emitido su voto.");
         }
 
+        boolean esMesaDeCiudadano = esMesa(personaId);
+        if (!esMesaDeCiudadano) {
+            boolean cedulaEstaRegistrada=cedulaEstaRegistrada(personaId);
+
+            if (!cedulaEstaRegistrada){//no esta en la base de datos
+                throw new java.lang.Exception("La persona con ID '" + personaId + " No esta registrada para votar");
+            }else{
+                //Esta en la base de datos pero no en su mesa
+                throw new java.lang.Exception("La persona con ID '" + personaId + " No se encuentra en la mesa que le corresponde");
+            }
+            
+        }
+
         try {
             VotoPendiente votoPendiente = new VotoPendiente(mesaId, candidatoId);
             csvManager.agregarVotoPendiente(votoPendiente);
