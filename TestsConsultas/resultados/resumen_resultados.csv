@@ -1,0 +1,4 @@
+Archivo,Total Consultas,Tiempo Total (ms),Tiempo Promedio (ms),Tiempo Mínimo (ms),Tiempo Máximo (ms),Consultas por Segundo
+results-100000-100.csv,100000,314353.0,3.14,0.0,12.0,318.11
+results-1000000-100.csv,1000000,232367490.0,232.37,0.0,6111.0,4.3
+results-7200-8.csv,7200,406770.0,56.5,1.0,1740.0,17.7
