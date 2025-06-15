@@ -41,6 +41,10 @@ public class Controlador {
 
     private static final String PUERTO_FILE = "puerto.mesa"; // Archivo para leer el puerto
     private static int PUERTO_MESA; // Variable para almacenar el puerto leído
+    private MedidorVoto medidorVoto;
+
+
+    
 
     
 
@@ -86,6 +90,8 @@ public class Controlador {
             System.out.println("Iniciando comunicacion confiable");
             inicializarComunicacionConfiable();
             exponerServicioVoteStation();
+            this.medidorVoto = new MedidorVoto();
+
 
         } catch (java.lang.Exception e) {
             e.printStackTrace();
@@ -128,25 +134,7 @@ public class Controlador {
             com.zeroc.Ice.ObjectPrx ackBase = ackAdapter
                     .createProxy(com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
             ackProxy = votacionRM.ACKVotoServicePrx.checkedCast(ackBase);
-            // ESTO NO SIRVE
-            try {
-                // Forzar una conexión al servidor
-                centralizadorRM.ice_ping();
-
-                // Obtener la conexión activa
-                com.zeroc.Ice.Connection connection = centralizadorRM.ice_getConnection();
-                if (connection != null) {
-                    // Asociar el adaptador ACK con esta conexión
-                    connection.setAdapter(ackAdapter);
-                    System.out.println("✅ Conexión bidireccional configurada correctamente");
-                } else {
-                    System.err.println("⚠️ No se pudo obtener una conexión para configurar bidireccionalidad");
-                }
-            } catch (com.zeroc.Ice.Exception e) {
-                System.err.println("❌ Error al configurar conexión bidireccional: " + e.getMessage());
-                e.printStackTrace();
-            }
-            // ESTO NO SIRVE
+            
 
             if (ackProxy == null) {
                 throw new java.lang.Exception(
@@ -385,14 +373,15 @@ public class Controlador {
             votacionRM.Voto voto = new votacionRM.Voto(document, candidateId, MESA_ID);
             System.out.println("Voto creado...");
 
-            // Verificar si el proxy está activo
+            
 
-            System.out.println("EN ESPERA DEL ACK......");
-
-            //this.centralizadorRM.recibirVoto(voto, ackProxy); 
-            System.out.println("ACK RECIBIDO CORRECTAMENTE");
-            System.out.println(document + " votó correctamente (ID: " + MESA_ID + ").");
-
+            try {
+                //long tiempo = MedidorVoto.medirTiempoEnvioVoto(voto, centralizadorRM, ackProxy);
+                //System.out.println(tiempo);
+            } catch (java.lang.Exception e) {
+                
+                e.printStackTrace();
+            }
 
             return 0; // Voto recibido correctamente
 
