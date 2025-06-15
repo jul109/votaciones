@@ -15,6 +15,7 @@ public class ACKVotoServiceI implements votacionRM.ACKVotoService {
         try {
             // Eliminar el voto de la lista de pendientes en CSV
             csvManager.eliminarVotoPendiente(votoId);
+            
             System.out.println("✅ ACK recibido para voto ID: " + votoId + " - Eliminado de pendientes");
         } catch (Exception e) {
             System.err.println("❌ Error al procesar ACK para voto ID " + votoId + ": " + e.getMessage());

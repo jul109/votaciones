@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 
 public class VoteDispatcher {
 
-    private static final int DELAY_ENTRE_VOTOS_MS = 2000; // 2 segundos
+    private static final int DELAY_ENTRE_VOTOS_MS = 0; // 2 segundos
 
     public static void consumirServicioVotacion(
             Map<String, List<VotoTest>> votosPorIpPort,
