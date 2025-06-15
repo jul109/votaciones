@@ -1,0 +1,4 @@
+archivo,total_votos,tiempo_total_ms,tiempo_promedio_ms,tiempo_minimo_ms,tiempo_maximo_ms,throughput_votos_s
+test_results_1800.csv,1800,485651,269.81,20,60040,3.71
+test_results_3600.csv,3600,637012,176.95,19,60030,5.65
+test_results_7200.csv,7200,1279548,177.72,18,60033,5.63
