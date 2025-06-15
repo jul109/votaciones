@@ -26,7 +26,7 @@ public class Controlador {
     // Variables para exponer tests de ote station
     private VoteStationImp voteStationServant; // Tu servant
     private ObjectAdapter voteStationAdapter;
-    
+
     private final String VOTE_STATION_IDENTITY = "VoteStation_Mesa";
 
     private final String ACK_ADAPTER_ENDPOINT = "default -p ";
@@ -36,25 +36,19 @@ public class Controlador {
     private static final String MESA_ID_FILE = "id.mesa";
     private static int MESA_ID;
 
-    //query station
-
+    // query station
 
     private static final String PUERTO_FILE = "puerto.mesa"; // Archivo para leer el puerto
     private static int PUERTO_MESA; // Variable para almacenar el puerto leído
     private MedidorVoto medidorVoto;
-
-
-    
-
-    
 
     public Controlador() {
         this.csvManager = new CsvManager(); // Inicializar CsvManager
         this.candidatosCache = null;
         try {
             MESA_ID = leerMesaIdDesdeArchivo();
-            PUERTO_MESA= leerPuertoDesdeArchivo();
-            ACK_ADAPTER_PUERTO=PUERTO_MESA+1;
+            PUERTO_MESA = leerPuertoDesdeArchivo();
+            ACK_ADAPTER_PUERTO = PUERTO_MESA + 1;
         } catch (java.lang.Exception e) {
             System.out.println("Error al leer mesa");
         }
@@ -92,7 +86,6 @@ public class Controlador {
             exponerServicioVoteStation();
             this.medidorVoto = new MedidorVoto();
 
-
         } catch (java.lang.Exception e) {
             e.printStackTrace();
             throw new java.lang.Exception("Error al inicializar la conexión con el servidor ICE: " + e.getMessage(), e);
@@ -125,7 +118,7 @@ public class Controlador {
             ackService = new ACKVotoServiceI(csvManager);
 
             com.zeroc.Ice.ObjectAdapter ackAdapter = communicator.createObjectAdapterWithEndpoints("ACKAdapter",
-                    ACK_ADAPTER_ENDPOINT+ACK_ADAPTER_PUERTO);
+                    ACK_ADAPTER_ENDPOINT + ACK_ADAPTER_PUERTO);
 
             ackAdapter.add(ackService, com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
 
@@ -134,7 +127,6 @@ public class Controlador {
             com.zeroc.Ice.ObjectPrx ackBase = ackAdapter
                     .createProxy(com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
             ackProxy = votacionRM.ACKVotoServicePrx.checkedCast(ackBase);
-            
 
             if (ackProxy == null) {
                 throw new java.lang.Exception(
@@ -200,15 +192,16 @@ public class Controlador {
 
         boolean esMesaDeCiudadano = esMesa(personaId);
         if (!esMesaDeCiudadano) {
-            boolean cedulaEstaRegistrada=cedulaEstaRegistrada(personaId);
+            boolean cedulaEstaRegistrada = cedulaEstaRegistrada(personaId);
 
-            if (!cedulaEstaRegistrada){//no esta en la base de datos
+            if (!cedulaEstaRegistrada) {// no esta en la base de datos
                 throw new java.lang.Exception("La persona con ID '" + personaId + " No esta registrada para votar");
-            }else{
-                //Esta en la base de datos pero no en su mesa
-                throw new java.lang.Exception("La persona con ID '" + personaId + " No se encuentra en la mesa que le corresponde");
+            } else {
+                // Esta en la base de datos pero no en su mesa
+                throw new java.lang.Exception(
+                        "La persona con ID '" + personaId + " No se encuentra en la mesa que le corresponde");
             }
-            
+
         }
 
         try {
@@ -256,7 +249,7 @@ public class Controlador {
                 System.err.println("Error de CSV al intentar eliminar voto ID " + voto.getId()
                         + " después de un envío (potencialmente) exitoso: " + csvEx.getMessage());
                 idsVotosFallidos.add(voto.getId());
-                
+
             } catch (java.lang.Exception e) {
                 System.err.println("Error general al procesar voto ID " + voto.getId() + ": " + e.getMessage());
                 idsVotosFallidos.add(voto.getId());
@@ -334,7 +327,6 @@ public class Controlador {
         voteStationAdapter = communicator.createObjectAdapterWithEndpoints(
                 "VoteStationAdapter", voteStationAdapterEndpoint);
 
-
         this.voteStationServant = new VoteStationImp(this);
         voteStationAdapter.add(this.voteStationServant, Util.stringToIdentity(VOTE_STATION_IDENTITY));
 
@@ -351,13 +343,13 @@ public class Controlador {
 
         boolean esMesaDeCiudadano = esMesa(document);
         if (!esMesaDeCiudadano) {
-            boolean cedulaEstaRegistrada=cedulaEstaRegistrada(document);
-            if (!cedulaEstaRegistrada){
+            boolean cedulaEstaRegistrada = cedulaEstaRegistrada(document);
+            if (!cedulaEstaRegistrada) {
                 return 3;
-            }else{
+            } else {
                 return 1;
             }
-            
+
         }
 
         try {
@@ -373,13 +365,21 @@ public class Controlador {
             votacionRM.Voto voto = new votacionRM.Voto(document, candidateId, MESA_ID);
             System.out.println("Voto creado...");
 
-            
-
             try {
-                //long tiempo = MedidorVoto.medirTiempoEnvioVoto(voto, centralizadorRM, ackProxy);
-                //System.out.println(tiempo);
+                // long tiempo = MedidorVoto.medirTiempoEnvioVoto(voto, centralizadorRM,
+                // ackProxy);
+                // System.out.println(tiempo);
+//
+                try {
+                    Thread.sleep(900);
+                    //long tiempo = MedidorVoto.medirTiempoEnvioVoto(voto, centralizadorRM, ackProxy);
+                    
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); 
+                }
+//
             } catch (java.lang.Exception e) {
-                
+
                 e.printStackTrace();
             }
 
@@ -410,14 +410,13 @@ public class Controlador {
         return mesaId;
     }
 
-    private boolean cedulaEstaRegistrada(String document){
+    private boolean cedulaEstaRegistrada(String document) {
         System.out.println("VERIFICANDO SI LA CEDULA ESTA REGISTRADA....");
-        String answer=queryStation.query(document);
+        String answer = queryStation.query(document);
         System.out.println("Verficacion completa....");
         System.out.println(answer);
         return !answer.equals("No está registrado");
     }
-
 
     private static int leerPuertoDesdeArchivo() throws IOException, NumberFormatException {
         int puerto = -1;
