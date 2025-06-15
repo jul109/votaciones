@@ -1,5 +1,7 @@
 package MesaVotacion;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import com.zeroc.IceGrid.*;
@@ -21,19 +23,28 @@ public class Controlador {
     private votacionRM.ACKVotoServicePrx ackProxy;
     private VotosRMTask votosRMTask;
 
-    //Variables para exponer tests de ote station
+    // Variables para exponer tests de ote station
     private VoteStationImp voteStationServant; // Tu servant
     private ObjectAdapter voteStationAdapter;
     private final String VOTE_STATION_ADAPTER_ENDPOINT = "default -p 10015";
     private final String VOTE_STATION_IDENTITY = "VoteStation_Mesa";
 
-
     private final String ACK_ADAPTER_ENDPOINT = "default -p 10014";
     private final String ACK_SERVICE_IDENTITY = "ACKVotoService_Mesa";
+
+    private static final String MESA_ID_FILE = "id.mesa";
+    private static int MESA_ID;
 
     public Controlador() {
         this.csvManager = new CsvManager(); // Inicializar CsvManager
         this.candidatosCache = null;
+        try {
+            MESA_ID = leerMesaIdDesdeArchivo();
+            
+        } catch (java.lang.Exception e) {
+            System.out.println("Error al leer mesa");
+        }
+        
     }
 
     public void inicializarConexion() throws java.lang.Exception {
@@ -52,7 +63,8 @@ public class Controlador {
             System.out.println("Proxy de Elecciones casteado correctamente");
 
             // Obtener el proxy para el servicio de consulta de mesa local
-            queryStation = consultaVotacion.queryStationPrx.checkedCast(query.findObjectByType("::consultaVotacion::queryStation"));
+            queryStation = consultaVotacion.queryStationPrx
+                    .checkedCast(query.findObjectByType("::consultaVotacion::queryStation"));
             if (queryStation == null) {
                 throw new java.lang.Exception("No se pudo obtener el proxy para 'queryStation'");
             }
@@ -78,34 +90,40 @@ public class Controlador {
             String[] args = {};
             communicator = com.zeroc.Ice.Util.initialize(args, "config.client");
             System.out.println("conectando con el broker");
-            
+
             com.zeroc.Ice.ObjectPrx baseCentralizador = communicator.stringToProxy("DemoIceGrid/Query");
 
             QueryPrx query = QueryPrx.checkedCast(baseCentralizador);
             System.out.println("Proxy de Query casteado correctamente");
 
-            centralizadorRM = votacionRM.CentralizadorRMPrx.checkedCast(query.findObjectByType("::votacionRM::CentralizadorRM"));
+            centralizadorRM = votacionRM.CentralizadorRMPrx
+                    .checkedCast(query.findObjectByType("::votacionRM::CentralizadorRM"));
             System.out.println("Proxy de Elecciones casteado correctamente");
 
             if (centralizadorRM == null) {
-                throw new java.lang.Exception("No se pudo conectar al CentralizadorRM en el Servidor Local. Verifique la IP, puerto y que el servicio esté activo.");
+                throw new java.lang.Exception(
+                        "No se pudo conectar al CentralizadorRM en el Servidor Local. Verifique la IP, puerto y que el servicio esté activo.");
             }
             System.out.println("✅ Conectado al Servidor Local ");
 
             ackService = new ACKVotoServiceI(csvManager);
-            
-            com.zeroc.Ice.ObjectAdapter ackAdapter = communicator.createObjectAdapterWithEndpoints("ACKAdapter", ACK_ADAPTER_ENDPOINT);
-            
-            ackAdapter.add(ackService, com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
-            
-            ackAdapter.activate();
-            System.out.println("Mesa de Votación escuchando ACKs en el puerto " + ACK_ADAPTER_ENDPOINT.split("-p ")[1] + ".");
 
-            com.zeroc.Ice.ObjectPrx ackBase = ackAdapter.createProxy(com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
+            com.zeroc.Ice.ObjectAdapter ackAdapter = communicator.createObjectAdapterWithEndpoints("ACKAdapter",
+                    ACK_ADAPTER_ENDPOINT);
+
+            ackAdapter.add(ackService, com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
+
+            ackAdapter.activate();
+            System.out.println(
+                    "Mesa de Votación escuchando ACKs en el puerto " + ACK_ADAPTER_ENDPOINT.split("-p ")[1] + ".");
+
+            com.zeroc.Ice.ObjectPrx ackBase = ackAdapter
+                    .createProxy(com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
             ackProxy = votacionRM.ACKVotoServicePrx.checkedCast(ackBase);
 
             if (ackProxy == null) {
-                throw new java.lang.Exception("No se pudo crear el proxy ACK local. Verifique la identidad '" + ACK_SERVICE_IDENTITY + "'.");
+                throw new java.lang.Exception(
+                        "No se pudo crear el proxy ACK local. Verifique la identidad '" + ACK_SERVICE_IDENTITY + "'.");
             }
             System.out.println("Proxy local de ACK creado.");
 
@@ -115,7 +133,8 @@ public class Controlador {
             System.out.println("Comunicación confiable inicializada exitosamente.");
 
         } catch (com.zeroc.Ice.LocalException iceEx) {
-            System.err.println("Error de comunicación Ice al inicializar (Comunicación Confiable): " + iceEx.getMessage());
+            System.err.println(
+                    "Error de comunicación Ice al inicializar (Comunicación Confiable): " + iceEx.getMessage());
             iceEx.printStackTrace();
             throw iceEx;
         } catch (java.lang.Exception rmEx) {
@@ -134,7 +153,8 @@ public class Controlador {
             try {
                 inicializarConexion();
             } catch (java.lang.Exception e) {
-                throw new java.lang.Exception("No se puede obtener el listado de candidatos. El servidor no se encuentra disponible");
+                throw new java.lang.Exception(
+                        "No se puede obtener el listado de candidatos. El servidor no se encuentra disponible");
             }
         }
         try {
@@ -142,7 +162,8 @@ public class Controlador {
             candidatosCache = elecciones.obtenerCandidatos();
             return candidatosCache;
         } catch (java.lang.Exception e) {
-            throw new java.lang.Exception("No se pudo obtener la lista de candidatos. Intente mas tarde: " + e.getMessage(), e);
+            throw new java.lang.Exception(
+                    "No se pudo obtener la lista de candidatos. Intente mas tarde: " + e.getMessage(), e);
         }
     }
 
@@ -166,7 +187,8 @@ public class Controlador {
             VotoPendiente votoPendiente = new VotoPendiente(mesaId, candidatoId);
             csvManager.agregarVotoPendiente(votoPendiente);
             csvManager.registrarVotante(personaId);
-            System.out.println("Voto de " + personaId + " para mesa " + mesaId +  " registrado localmente (ID Voto: " + votoPendiente.getId() + ").");
+            System.out.println("Voto de " + personaId + " para mesa " + mesaId + " registrado localmente (ID Voto: "
+                    + votoPendiente.getId() + ").");
 
         } catch (IOException e) {
             throw new java.lang.Exception("Error al registrar el voto localmente: " + e.getMessage(), e);
@@ -190,7 +212,8 @@ public class Controlador {
 
         for (VotoPendiente voto : pendientes) {
             try {
-                System.out.println("Enviando voto ID: " + voto.getId() + " (Mesa: " + voto.getMesaId() + ")" + ", " + "Candidato: " + voto.getCandidatoId() + ")");
+                System.out.println("Enviando voto ID: " + voto.getId() + " (Mesa: " + voto.getMesaId() + ")" + ", "
+                        + "Candidato: " + voto.getCandidatoId() + ")");
                 elecciones.registrarVoto(voto.getCandidatoId(), voto.getMesaId());
                 System.out.println("Voto ID: " + voto.getId() + " enviado con éxito al servidor.");
 
@@ -240,7 +263,7 @@ public class Controlador {
         try {
             System.out.println("Obteniendo ciudadanos para la mesa: " + mesaId);
             String[] ciudadanos = queryStation.obtenerCiudadanos(mesaId);
-            
+
             if (ciudadanos != null && ciudadanos.length > 0) {
                 // Crear archivo CSV con los ciudadanos
                 String csvFileName = "ciudadanos_mesa.csv";
@@ -268,19 +291,63 @@ public class Controlador {
         }
     }
 
-
     public void exponerServicioVoteStation() throws java.lang.Exception {
-        if (communicator == null ) {
+        if (communicator == null) {
             throw new IllegalStateException("ICE communicator is not initialized or is destroyed.");
         }
 
         System.out.println("Exposing VoteStation service...");
         voteStationAdapter = communicator.createObjectAdapterWithEndpoints(
-            "VoteStationAdapter", VOTE_STATION_ADAPTER_ENDPOINT);
-        this.voteStationServant=new VoteStationImp();
+                "VoteStationAdapter", VOTE_STATION_ADAPTER_ENDPOINT);
+        this.voteStationServant = new VoteStationImp(this);
         voteStationAdapter.add(this.voteStationServant, Util.stringToIdentity(VOTE_STATION_IDENTITY));
-        
-        voteStationAdapter.activate(); 
-        System.out.println("VoteStation service exposed on port " + VOTE_STATION_ADAPTER_ENDPOINT.split("-p ")[1] + " with identity '" + VOTE_STATION_IDENTITY + "'.");
+
+        voteStationAdapter.activate();
+        System.out.println("VoteStation service exposed on port " + VOTE_STATION_ADAPTER_ENDPOINT.split("-p ")[1]
+                + " with identity '" + VOTE_STATION_IDENTITY + "'.");
     }
+
+    public int votarTest(String document, int candidateId) {
+        System.out.println("Llamado a votar test");
+        if (validarHaVotado(document)) {
+            return 2; // Ya votó
+        }
+
+        boolean esMesaDeCiudadano = esMesa(document);
+        if (!esMesaDeCiudadano) {
+            return 3; // No le corresponde esta mesa
+        }
+
+        try {
+            csvManager.registrarVotante(document); // Solo lo marcas si sí llegó
+            votacionRM.Voto voto = new votacionRM.Voto(document, candidateId, MESA_ID);
+            this.centralizadorRM.recibirVoto(voto, ackProxy); // bloquea hasta ACK
+
+            System.out.println(document + " votó correctamente (ID: " + MESA_ID + ").");
+
+            return 1; // Voto recibido correctamente
+        } catch (java.lang.Exception e) {
+            System.err.println("❌ Error al enviar voto directamente: " + e.getMessage());
+            return -1; // Error de envío
+        }
+    }
+
+    public boolean esMesa(String document) {
+        return csvManager.esMesaDeCiudadano(document);
+    }
+
+    private static int leerMesaIdDesdeArchivo() throws IOException, NumberFormatException {
+        int mesaId = -1;
+        try (BufferedReader reader = new BufferedReader(new FileReader(MESA_ID_FILE))) {
+            String line = reader.readLine();
+            if (line != null) {
+                mesaId = Integer.parseInt(line.trim());
+            } else {
+
+                throw new IOException("El archivo '" + MESA_ID_FILE + "' está vacío.");
+            }
+        }
+        return mesaId;
+    }
+
 }

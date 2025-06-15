@@ -1,6 +1,5 @@
 package MesaVotacion;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +20,10 @@ public class CsvManager {
 
     private final List<VotoPendiente> votosPendientes;
     private final Set<Votante> personasQueVotaron; 
+    private Set<String> ciudadanos; 
+    private final String nombreArchivoCiudadanos = "ciudadanos_mesa.csv";
+    private final Path ciudadanosFilePath = Paths.get(nombreArchivoCiudadanos);;
+    
 
     public CsvManager() {
         String nombreArchivoVotosPendientes = "votos_pendientes.csv";
@@ -34,6 +37,8 @@ public class CsvManager {
 
         cargarVotosPendientes();
         cargarVotantes();
+        
+        
     }
 
     // --- Gestión de Votos Pendientes ---
@@ -196,6 +201,39 @@ public class CsvManager {
             for (String ciudadano : ciudadanos) {
                 out.println(ciudadano);
             }
+            inicializarYcargarCiudadanos();
+        }
+    }
+
+    private void inicializarYcargarCiudadanos() {
+        System.out.println("Cargandos ciudadanos de la mesa");
+        Set<String> tempCiudadanos = Collections.synchronizedSet(new HashSet<>());
+        if (Files.exists(ciudadanosFilePath)) {
+            try {
+                List<String> lines = Files.readAllLines(ciudadanosFilePath, StandardCharsets.UTF_8);
+                for (String line : lines) {
+                    if (line.trim().isEmpty()) continue;
+                    tempCiudadanos.add(line.trim()); 
+                }
+                System.out.println("Set de ciudadanos cargado exitosamente desde: " + nombreArchivoCiudadanos);
+            } catch (IOException e) {
+                System.err.println("Error crítico al cargar ciudadanos desde " + nombreArchivoCiudadanos + ": " + e.getMessage());
+                
+            }
+        } else {
+            System.out.println("El archivo de ciudadanos '" + nombreArchivoCiudadanos + "' no existe. El Set se inicializará vacío.");
+        }
+        System.out.println("Ciudadanos de la mesa cargados");
+        this.ciudadanos=tempCiudadanos;
+        
+    }
+    public boolean esMesaDeCiudadano(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            return false;
+        }
+        
+        synchronized (ciudadanos) {
+            return ciudadanos.contains(id.trim());
         }
     }
 }
