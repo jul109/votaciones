@@ -1,50 +1,88 @@
 <!-- Copyright (c) ZeroC, Inc. All rights reserved. -->
 
-
-    <!--
-    <replica-group id="EleccionesGroup">
-      <load-balancing type="round-robin"/>
-      <object identity="votaciones" type="::Votacion::Elecciones"/>
-    </replica-group>
-    -->
-
-
-      <!--
-      <server id="EleccionesLocal-0" exe="java" activation="on-demand">
-        <option>-cp</option>
-        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/EleccionesLocal.jar</option>
-        <option>EleccionesLocal.Server</option>
-        <adapter name="EleccionesAdapter" endpoints="tcp -p 10009" replica-group="EleccionesGroup"/>
-        <property name="Identity" value="1"/>
-      </server>
-      -->
-
 <icegrid>
   <application name="Votaciones">
 
-    <node name="node-104m12">
+    <replica-group id="EleccionesGroup">
+      <load-balancing type="round-robin"/>
+      <object identity="votaciones" type="::Votacion::Elecciones"/>
+      <object identity="ReliableVotacion" type="::votacionRM::CentralizadorRM"/>
+    </replica-group>
 
+    <replica-group id="MesaGroup">
+      <load-balancing type="round-robin"/>
+      <object identity="consultaVotacion" type="::consultaVotacion::queryStation"/>
+    </replica-group>
+
+    <node name="node-104m12">
       <server id="EleccionesLocal-0" exe="java" activation="always">
         <option>-cp</option>
-        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/EleccionesLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>
+        <option>/home/swarch/LosPelados/deploy/ice-3.7.6.jar:/home/swarch/LosPelados/deploy/postgresql-42.3.1.jar:/home/swarch/LosPelados/deploy/EleccionesLocal.jar:/home/swarch/LosPelados/deploy/icegrid-3.7.10.jar</option>
         <option>EleccionesLocal.Server</option>
-        <adapter name="EleccionesAdapter" endpoints="tcp -p 10009">
-          <object identity="votaciones" type="::Votacion::Elecciones" property="IdentityVotaciones"/>
-          <object identity="ReliableVotacion" type="::votacionRM::CentralizadorRM" property="IdentityReliable"/>
+        <adapter name="EleccionesAdapter" endpoints="tcp -p 10009" replica-group="EleccionesGroup">
         </adapter>
       </server>
 
+      <server id="EleccionesLocal-1" exe="java" activation="always">
+        <option>-cp</option>
+        <option>/home/swarch/LosPelados/deploy1/ice-3.7.6.jar:/home/swarch/LosPelados/deploy1/postgresql-42.3.1.jar:/home/swarch/LosPelados/deploy1/EleccionesLocal.jar:/home/swarch/LosPelados/deploy1/icegrid-3.7.10.jar</option>
+        <option>EleccionesLocal.Server</option>
+        <adapter name="EleccionesAdapter" endpoints="tcp -p 10008" replica-group="EleccionesGroup">
+        </adapter>
+      </server>
+
+
+      <server id="EleccionesLocal-2" exe="java" activation="always">
+        <option>-cp</option>
+        <option>/home/swarch/LosPelados/deploy2/ice-3.7.6.jar:/home/swarch/LosPelados/deploy2/postgresql-42.3.1.jar:/home/swarch/LosPelados/deploy2/EleccionesLocal.jar:/home/swarch/LosPelados/deploy2/icegrid-3.7.10.jar</option>
+        <option>EleccionesLocal.Server</option>
+        <adapter name="EleccionesAdapter" endpoints="tcp -p 10007" replica-group="EleccionesGroup">
+        </adapter>
+      </server>
+
+      <server id="EleccionesLocal-3" exe="java" activation="always">
+        <option>-cp</option>
+        <option>/home/swarch/LosPelados/deploy3/ice-3.7.6.jar:/home/swarch/LosPelados/deploy3/postgresql-42.3.1.jar:/home/swarch/LosPelados/deploy3/EleccionesLocal.jar:/home/swarch/LosPelados/deploy3/icegrid-3.7.10.jar</option>
+        <option>EleccionesLocal.Server</option>
+        <adapter name="EleccionesAdapter" endpoints="tcp -p 10006" replica-group="EleccionesGroup">
+        </adapter>
+      </server>
     </node>
 
     <node name="node-104m14">
       <server id="MesaVotacionLocal-0" exe="java" activation="always">
         <option>-cp</option>
-        <option>{{JAR_PATH}}/ice-3.7.6.jar:{{JAR_PATH}}/postgresql-42.3.1.jar:{{JAR_PATH}}/MesaVotacionLocal.jar:{{JAR_PATH}}/icegrid-3.7.10.jar</option>
+        <option>/home/swarch/LosPelados/deploy/ice-3.7.6.jar:/home/swarch/LosPelados/deploy/postgresql-42.3.1.jar:/home/swarch/LosPelados/deploy/MesaVotacionLocal.jar:/home/swarch/LosPelados/deploy/icegrid-3.7.10.jar</option>
         <option>consultaVotacion.QueryStationServer</option>
-        <adapter name="MesaLocalAdapter" endpoints="tcp -p 10027">
-          <object identity="consultaVotacion" type="::consultaVotacion::queryStation" property="Identity"/>
+        <adapter name="MesaLocalAdapter" endpoints="tcp -p 10027" replica-group="MesaGroup">
         </adapter>
       </server>
+
+      <server id="MesaVotacionLocal-1" exe="java" activation="always">
+        <option>-cp</option>
+        <option>/home/swarch/LosPelados/deploy1/ice-3.7.6.jar:/home/swarch/LosPelados/deploy1/postgresql-42.3.1.jar:/home/swarch/LosPelados/deploy1/MesaVotacionLocal.jar:/home/swarch/LosPelados/deploy1/icegrid-3.7.10.jar</option>
+        <option>consultaVotacion.QueryStationServer</option>
+        <adapter name="MesaLocalAdapter" endpoints="tcp -p 10028" replica-group="MesaGroup">
+        </adapter>
+      </server>
+
+
+      <server id="MesaVotacionLocal-2" exe="java" activation="always">
+        <option>-cp</option>
+        <option>/home/swarch/LosPelados/deploy2/ice-3.7.6.jar:/home/swarch/LosPelados/deploy2/postgresql-42.3.1.jar:/home/swarch/LosPelados/deploy2/MesaVotacionLocal.jar:/home/swarch/LosPelados/deploy2/icegrid-3.7.10.jar</option>
+        <option>consultaVotacion.QueryStationServer</option>
+        <adapter name="MesaLocalAdapter" endpoints="tcp -p 10029" replica-group="MesaGroup">
+        </adapter>
+      </server>
+
+      <server id="MesaVotacionLocal-3" exe="java" activation="always">
+        <option>-cp</option>
+        <option>/home/swarch/LosPelados/deploy3/ice-3.7.6.jar:/home/swarch/LosPelados/deploy3/postgresql-42.3.1.jar:/home/swarch/LosPelados/deploy3/MesaVotacionLocal.jar:/home/swarch/LosPelados/deploy3/icegrid-3.7.10.jar</option>
+        <option>consultaVotacion.QueryStationServer</option>
+        <adapter name="MesaLocalAdapter" endpoints="tcp -p 10030" replica-group="MesaGroup">
+        </adapter>
+      </server>
+
     </node>
 
   </application>
