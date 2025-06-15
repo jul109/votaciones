@@ -5,95 +5,78 @@ import com.zeroc.Ice.Communicator;
 import com.zeroc.Ice.ObjectPrx;
 import com.zeroc.Ice.Util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TestMesaVotacion {
 
     public static void main(String[] args) {
         Communicator communicator = null;
-        CsvManager csvManager = new CsvManager(); // asegúrate de que CsvManager esté bien implementado
-        Map<String, VoteStationPrx> voteStationProxies = new HashMap<>();
+        Map<String, VoteStationPrx> proxiesPorIpPort = new HashMap<>();
+        CsvManager csvManager = new CsvManager();
 
         try {
             communicator = Util.initialize(args);
             System.out.println("✅ ICE communicator inicializado");
 
-            Map<String, VotoTest> votosCargados = csvManager.getVotesMap();
-            if (votosCargados == null || votosCargados.isEmpty()) {
-                System.out.println("⚠️ No se encontraron votos en 'votos.csv'.");
+            // Obtener votos agrupados por IP:Puerto
+            Map<String, List<VotoTest>> votosPorIpPort = csvManager.getVotesByIpAndPortMap();
+            if (votosPorIpPort.isEmpty()) {
+                System.out.println("⚠️ No se encontraron votos en el archivo CSV.");
                 return;
             }
 
-            // Mostrar votos
-            for (VotoTest voto : votosCargados.values()) {
-                System.out.println("📥 Voto cargado: " + voto);
-            }
+            // Mostrar votos cargados
+            votosPorIpPort.forEach((ipPort, votos) -> {
+                System.out.println("📥 Votos para " + ipPort + ":");
+                votos.forEach(System.out::println);
+            });
 
-            // Crear conjunto de IP:PUERTO únicos
-            Set<String> uniqueIpPorts = new HashSet<>();
-            for (VotoTest voto : votosCargados.values()) {
-                uniqueIpPorts.add(voto.getIpMesa() + ":" + voto.getPuerto());
-            }
-
-            // Crear proxies
-            System.out.println("\n🔌 Inicializando proxies de VoteStation...");
-            for (String ipPort : uniqueIpPorts) {
+            // Crear proxies por cada IP:Puerto única
+            for (String ipPort : votosPorIpPort.keySet()) {
                 String[] parts = ipPort.split(":");
                 if (parts.length != 2) {
-                    System.err.println("❌ Formato inválido para IP:PUERTO → " + ipPort);
+                    System.err.println("❌ Formato inválido de IP:PUERTO → " + ipPort);
                     continue;
                 }
 
                 String ip = parts[0];
-                String port = parts[1];
-                String proxyStr = "VoteStation_Mesa:tcp -h " + ip + " -p " + port;
+                String puerto = parts[1];
+                String proxyStr = "VoteStation_Mesa:tcp -h " + ip + " -p " + puerto;
 
                 try {
                     ObjectPrx base = communicator.stringToProxy(proxyStr);
                     VoteStationPrx proxy = VoteStationPrx.checkedCast(base);
-
                     if (proxy != null) {
-                        voteStationProxies.put(ipPort, proxy);
-                        System.out.println("  ✅ Proxy creado para " + ipPort);
+                        proxiesPorIpPort.put(ipPort, proxy);
+                        System.out.println("🔌 Proxy conectado: " + ipPort);
                     } else {
-                        System.err.println("  ⚠️ No se pudo castear el proxy para " + ipPort);
+                        System.err.println("⚠️ Proxy nulo para " + ipPort);
                     }
                 } catch (Exception e) {
-                    System.err.println("  ❌ Error al crear proxy para " + ipPort + ": " + e.getMessage());
+                    System.err.println("❌ Error al crear proxy para " + ipPort + ": " + e.getMessage());
                 }
             }
 
-            // Resumen
-            if (voteStationProxies.isEmpty()) {
-                System.out.println("🚫 No se pudo inicializar ningún proxy de VoteStation.");
-            } else {
-                System.out.println("\n🧾 Proxies inicializados:");
-                voteStationProxies.forEach((ipPort, proxy) -> System.out.println("  - " + ipPort));
+            // Verificar si se crearon proxies
+            if (proxiesPorIpPort.isEmpty()) {
+                System.out.println("🚫 No se pudo conectar a ningún proxy.");
+                return;
             }
 
-            consumeVoteStationService(votosCargados, voteStationProxies);
+            
+            VoteDispatcher.consumirServicioVotacion(votosPorIpPort, proxiesPorIpPort);
+
 
         } catch (Exception e) {
-            System.err.println("💥 Error en cliente de TestMesaVotacion:");
+            System.err.println("💥 Error en TestMesaVotacion:");
             e.printStackTrace();
         } finally {
             if (communicator != null) {
-                try {
-                    communicator.destroy();
-                    System.out.println("🛑 ICE communicator cerrado.");
-                } catch (Exception e) {
-                    System.err.println("Error al cerrar ICE: " + e.getMessage());
-                }
+                communicator.destroy();
+                System.out.println("🛑 ICE communicator cerrado.");
             }
         }
     }
 
-    public static void consumeVoteStationService(
-            Map<String, VotoTest> votesFromCsv,
-            Map<String, VoteStationPrx> voteStationProxies) {
-        // Aquí puedes iterar y enviar los votos a cada proxy correspondiente
-    }
+    
 }
