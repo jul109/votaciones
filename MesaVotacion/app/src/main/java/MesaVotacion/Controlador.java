@@ -29,8 +29,9 @@ public class Controlador {
     
     private final String VOTE_STATION_IDENTITY = "VoteStation_Mesa";
 
-    private final String ACK_ADAPTER_ENDPOINT = "default -p 10014";
+    private final String ACK_ADAPTER_ENDPOINT = "default -p ";
     private final String ACK_SERVICE_IDENTITY = "ACKVotoService_Mesa";
+    private static int ACK_ADAPTER_PUERTO;
 
     private static final String MESA_ID_FILE = "id.mesa";
     private static int MESA_ID;
@@ -49,6 +50,7 @@ public class Controlador {
         try {
             MESA_ID = leerMesaIdDesdeArchivo();
             PUERTO_MESA= leerPuertoDesdeArchivo();
+            ACK_ADAPTER_PUERTO=PUERTO_MESA+1;
         } catch (java.lang.Exception e) {
             System.out.println("Error al leer mesa");
         }
@@ -117,13 +119,12 @@ public class Controlador {
             ackService = new ACKVotoServiceI(csvManager);
 
             com.zeroc.Ice.ObjectAdapter ackAdapter = communicator.createObjectAdapterWithEndpoints("ACKAdapter",
-                    ACK_ADAPTER_ENDPOINT);
+                    ACK_ADAPTER_ENDPOINT+ACK_ADAPTER_PUERTO);
 
             ackAdapter.add(ackService, com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
 
             ackAdapter.activate();
-            System.out.println("Mesa de Votación escuchando ACKs en el puerto " +
-                    ACK_ADAPTER_ENDPOINT.split("-p ")[1] + ".");
+            System.out.println("Mesa de Votación escuchando ACKs en el puerto" + ACK_ADAPTER_PUERTO);
             com.zeroc.Ice.ObjectPrx ackBase = ackAdapter
                     .createProxy(com.zeroc.Ice.Util.stringToIdentity(ACK_SERVICE_IDENTITY));
             ackProxy = votacionRM.ACKVotoServicePrx.checkedCast(ackBase);
