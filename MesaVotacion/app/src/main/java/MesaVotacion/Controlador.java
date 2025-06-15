@@ -259,13 +259,16 @@ public class Controlador {
 
                 csvManager.eliminarVotoPendiente(voto.getId());
                 votosEnviadosConExito++;
+
             } catch (com.zeroc.Ice.Exception iceEx) {
                 System.err.println("Error de ICE al enviar voto ID " + voto.getId() + ": " + iceEx.getMessage());
                 idsVotosFallidos.add(voto.getId());
+
             } catch (IOException csvEx) {
                 System.err.println("Error de CSV al intentar eliminar voto ID " + voto.getId()
                         + " después de un envío (potencialmente) exitoso: " + csvEx.getMessage());
                 idsVotosFallidos.add(voto.getId());
+                
             } catch (java.lang.Exception e) {
                 System.err.println("Error general al procesar voto ID " + voto.getId() + ": " + e.getMessage());
                 idsVotosFallidos.add(voto.getId());
