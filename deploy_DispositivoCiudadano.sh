@@ -1,6 +1,7 @@
 #!/bin/bash
 
-DESTINO=$1              
+DESTINO=$1
+DEPLOY_NUMBER=$2              
 DIR_COMPACT="compact"
 
 echo "Eliminando carpeta compact..."
@@ -8,6 +9,11 @@ rm -rf "$DIR_COMPACT"
 
 echo "Creando carpeta compact..."
 mkdir "$DIR_COMPACT"
+
+cd DispositivoCiudadano
+echo "Compilando DispositivoCiudadano..."
+gradle clean build installDist
+cd ..
 
 echo "Copiando DispositivoCiudadano.jar..."
 cp DispositivoCiudadano/build/libs/DispositivoCiudadano.jar "$DIR_COMPACT/"
@@ -34,7 +40,7 @@ EOF
 chmod +x "$SCRIPT_OBJETIVO"
 
 echo "Enviando por scp al destino..."
-scp -r "$DIR_COMPACT" "$DESTINO:~/LosPelados/deploy"
+scp -r "$DIR_COMPACT" "$DESTINO:~/LosPelados/$DEPLOY_NUMBER"
 
 echo "Eliminando carpeta compact..."
 rm -rf "$DIR_COMPACT"

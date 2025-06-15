@@ -12,7 +12,7 @@ public class Server {
         int status = 0;
         try (Communicator communicator = Util.initialize(args)) {
             java.sql.Connection conn = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/eleccionesdb", "postgres", "postgres");
+                "jdbc:postgresql://localhost:5432/eleccionesdb_3", "postgres", "postgres");
 
 
             ObjectAdapter mesaAdapter = communicator.createObjectAdapter("EleccionesAdapter");
@@ -22,12 +22,12 @@ public class Server {
             
             // Crear e insertar CentralizadorRM
             CentralizadorRMImpl centralizadorRMServant = new CentralizadorRMImpl(conn);
-            Identity idCentralizador = Util.stringToIdentity(properties.getProperty("IdentityReliable"));
+            Identity idCentralizador = Util.stringToIdentity("ReliableVotacion");
             mesaAdapter.add(centralizadorRMServant, idCentralizador);
             
             // Crear e insertar Elecciones
             EleccionesI eleccionesServant = new EleccionesI(conn);
-            Identity idElecciones = Util.stringToIdentity(properties.getProperty("IdentityVotaciones"));
+            Identity idElecciones = Util.stringToIdentity("votaciones");
             mesaAdapter.add(eleccionesServant, idElecciones);
             
             // Activar adaptador
@@ -41,7 +41,7 @@ public class Server {
             System.out.println("1.5");
 
             // Reliable Messaging setup
-            ObjectAdapter rmAdapter = communicator.createObjectAdapterWithEndpoints("RMAdapter", "default -p 10011");
+            ObjectAdapter rmAdapter = communicator.createObjectAdapterWithEndpoints("RMAdapter", "default -p 11003");
 
             // ACK local
             ACKVotoServiceI ackServant = new ACKVotoServiceI(conn);

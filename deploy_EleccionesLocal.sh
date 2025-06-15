@@ -2,7 +2,8 @@
 
 
 DESTINO=$1           
-NOMBRE_NODO=$2        
+NOMBRE_NODO=$2       
+DEPLOY_NUMBER=$3
 DIR_COMPACT="compact"
 
 echo "Eliminando carpeta compact..."
@@ -10,6 +11,11 @@ rm -rf "$DIR_COMPACT"
 
 echo "Creando carpeta compact..."
 mkdir -p "$DIR_COMPACT/db/node"
+
+cd EleccionesLocal
+echo "Compilando EleccionesLocal..."
+gradle clean build installDist
+cd ..
 
 echo "Copiando EleccionesLocal.jar..."
 cp EleccionesLocal/build/libs/EleccionesLocal.jar "$DIR_COMPACT/"
@@ -40,7 +46,7 @@ EOF
 chmod +x "$SCRIPT_OBJETIVO"
 
 echo "Enviando por scp al destino..."
-scp -r "$DIR_COMPACT" "$DESTINO:~/LosPelados/deploy"
+scp -r "$DIR_COMPACT" "$DESTINO:~/LosPelados/$DEPLOY_NUMBER"
 
 echo "Eliminando carpeta compact..."
 rm -rf "$DIR_COMPACT"

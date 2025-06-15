@@ -3,11 +3,16 @@
 
 DESTINO=$1                   
 MESA_ID=$2
+DEPLOY_NUMBER=$3
 DIR_COMPACT="compact"
 
 echo "Eliminando carpeta compact..."
 rm -rf "$DIR_COMPACT"
 
+cd MesaVotacion
+echo "Compilando MesaVotacion..."
+gradle clean build installDist
+cd ..
 
 echo "Copiando MesaVotacion.jar..."
 cp MesaVotacion/app/build/libs/MesaVotacion.jar "$DIR_COMPACT/"
@@ -37,7 +42,7 @@ echo "$MESA_ID" > "$DIR_COMPACT/id.mesa"
 chmod +x "$SCRIPT_OBJETIVO"
 
 echo "Enviando por scp al destino..."
-scp -r "$DIR_COMPACT" "$DESTINO:~/LosPelados/deploy"
+scp -r "$DIR_COMPACT" "$DESTINO:~/LosPelados/$DEPLOY_NUMBER"
 
 echo "Eliminando carpeta compact..."
 rm -rf "$DIR_COMPACT"

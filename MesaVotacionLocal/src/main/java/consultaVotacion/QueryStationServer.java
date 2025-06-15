@@ -24,13 +24,13 @@ public class QueryStationServer {
             // Crear e instanciar el servidor
             queryStationI queryStationServant = new queryStationI(dbManager);
             Properties properties = communicator.getProperties();
-            Identity id = Util.stringToIdentity(properties.getProperty("Identity"));
+            Identity id = Util.stringToIdentity("consultaVotacion");
             adapter.add(queryStationServant, id);
 
             // Activar el adaptador
             adapter.activate();
 
-            System.out.println("Servidor iniciado en el puerto 10000 ");
+            System.out.println("Servidor iniciado \n");
 
             // Mantener el servidor en ejecución
             communicator.waitForShutdown();
