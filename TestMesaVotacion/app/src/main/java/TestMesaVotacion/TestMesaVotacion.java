@@ -2,77 +2,98 @@ package TestMesaVotacion;
 
 import VotacionTest.VoteStationPrx;
 import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.ObjectPrx;
 import com.zeroc.Ice.Util;
+
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class TestMesaVotacion {
 
     public static void main(String[] args) {
-        CsvManager csvManager = new CsvManager();
-        Map<String, VotoTest> votosCargados = csvManager.getVotesMap();
-
-        if (votosCargados.isEmpty()) {
-            System.out.println("No se encontraron votos o hubo un error al cargar 'votos.csv'.");
-        } else {
-            for (VotoTest voto : votosCargados.values()) {
-                System.out.println("Voto cargado: " + voto);
-            }
-        }
-
-        consumeVoteStationService(votosCargados);
-    }
-
-    public static void consumeVoteStationService(Map<String, VotoTest> votesFromCsv) {
         Communicator communicator = null;
-        VoteStationPrx voteStationProxy = null;
-        
+        CsvManager csvManager = new CsvManager(); // asegúrate de que CsvManager esté bien implementado
+        Map<String, VoteStationPrx> voteStationProxies = new HashMap<>();
+
         try {
-            communicator = Util.initialize(new String[]{}); 
-            System.out.println("Comunicador Ice inicializado para el cliente.");
+            communicator = Util.initialize(args);
+            System.out.println("✅ ICE communicator inicializado");
 
-            // The proxy string now includes the hostname x206m03
-            String voteStationProxyString = "VoteStation_Mesa:default -h x206m03 -p 10015"; 
-            voteStationProxy = VotacionTest.VoteStationPrx.checkedCast(
-                                   communicator.stringToProxy(voteStationProxyString));
-
-            if (voteStationProxy == null) {
-                System.err.println("ERROR: No se pudo obtener el proxy para VoteStation.");
-                System.err.println("Asegúrate de que el servidor esté ejecutándose en 'x206m03' en el puerto '10015'");
-                System.err.println("con la identidad 'VoteStation_Mesa'.");
-                throw new Exception("Proxy de VoteStation no disponible.");
+            Map<String, VotoTest> votosCargados = csvManager.getVotesMap();
+            if (votosCargados == null || votosCargados.isEmpty()) {
+                System.out.println("⚠️ No se encontraron votos en 'votos.csv'.");
+                return;
             }
-            System.out.println("Proxy de VoteStation obtenido. ¡Listo para enviar votos al servidor remoto!");
 
-            int totalVotosEnviados = 0;
-            for (VotoTest voto : votesFromCsv.values()) {
-                String document = voto.getDocumentoVotante(); 
-                int candidateId = voto.getIdCandidato(); 
+            // Mostrar votos
+            for (VotoTest voto : votosCargados.values()) {
+                System.out.println("📥 Voto cargado: " + voto);
+            }
 
-                System.out.print("Enviando voto (Doc: " + document + ", Cand: " + candidateId + ") -> ");
+            // Crear conjunto de IP:PUERTO únicos
+            Set<String> uniqueIpPorts = new HashSet<>();
+            for (VotoTest voto : votosCargados.values()) {
+                uniqueIpPorts.add(voto.getIpMesa() + ":" + voto.getPuerto());
+            }
+
+            // Crear proxies
+            System.out.println("\n🔌 Inicializando proxies de VoteStation...");
+            for (String ipPort : uniqueIpPorts) {
+                String[] parts = ipPort.split(":");
+                if (parts.length != 2) {
+                    System.err.println("❌ Formato inválido para IP:PUERTO → " + ipPort);
+                    continue;
+                }
+
+                String ip = parts[0];
+                String port = parts[1];
+                String proxyStr = "VoteStation_Mesa:tcp -h " + ip + " -p " + port;
+
                 try {
-                    int result = voteStationProxy.vote(document, candidateId);
-                    System.out.println("Resultado del servicio: " + result);
-                    totalVotosEnviados++;
-                } catch (com.zeroc.Ice.LocalException e) {
-                    System.err.println("Error de comunicación ICE al enviar voto para " + document + " (servidor remoto): " + e.getMessage());
+                    ObjectPrx base = communicator.stringToProxy(proxyStr);
+                    VoteStationPrx proxy = VoteStationPrx.checkedCast(base);
+
+                    if (proxy != null) {
+                        voteStationProxies.put(ipPort, proxy);
+                        System.out.println("  ✅ Proxy creado para " + ipPort);
+                    } else {
+                        System.err.println("  ⚠️ No se pudo castear el proxy para " + ipPort);
+                    }
                 } catch (Exception e) {
-                    System.err.println("Error al enviar voto para " + document + " (servidor remoto): " + e.getMessage());
+                    System.err.println("  ❌ Error al crear proxy para " + ipPort + ": " + e.getMessage());
                 }
             }
-            System.out.println("Total de votos enviados al servicio remoto: " + totalVotosEnviados);
+
+            // Resumen
+            if (voteStationProxies.isEmpty()) {
+                System.out.println("🚫 No se pudo inicializar ningún proxy de VoteStation.");
+            } else {
+                System.out.println("\n🧾 Proxies inicializados:");
+                voteStationProxies.forEach((ipPort, proxy) -> System.out.println("  - " + ipPort));
+            }
+
+            consumeVoteStationService(votosCargados, voteStationProxies);
 
         } catch (Exception e) {
-            System.err.println("Error grave durante la ejecución del cliente de servicio:");
+            System.err.println("💥 Error en cliente de TestMesaVotacion:");
             e.printStackTrace();
         } finally {
             if (communicator != null) {
                 try {
                     communicator.destroy();
-                    System.out.println("Comunicador Ice del cliente cerrado.");
+                    System.out.println("🛑 ICE communicator cerrado.");
                 } catch (Exception e) {
-                    System.err.println("Error al cerrar el comunicador Ice del cliente: " + e.getMessage());
+                    System.err.println("Error al cerrar ICE: " + e.getMessage());
                 }
             }
         }
+    }
+
+    public static void consumeVoteStationService(
+            Map<String, VotoTest> votesFromCsv,
+            Map<String, VoteStationPrx> voteStationProxies) {
+        // Aquí puedes iterar y enviar los votos a cada proxy correspondiente
     }
 }

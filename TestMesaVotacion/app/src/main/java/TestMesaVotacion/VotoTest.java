@@ -4,14 +4,14 @@ public class VotoTest {
 
     private String documentoVotante;
     private int idCandidato; 
-    private String candidatoSeleccionadoNombre; 
     private String ipMesa;
+    private String puerto; // Nuevo atributo añadido
 
-    public VotoTest(String documentoVotante, int idCandidato, String candidatoSeleccionadoNombre, String ipMesa) {
+    public VotoTest(String documentoVotante, int idCandidato, String ipMesa, String puerto) {
         this.documentoVotante = documentoVotante;
         this.idCandidato = idCandidato;
-        this.candidatoSeleccionadoNombre = candidatoSeleccionadoNombre;
         this.ipMesa = ipMesa;
+        this.puerto = puerto; // Inicializar el nuevo atributo
     }
 
     public String getDocumentoVotante() {
@@ -22,12 +22,12 @@ public class VotoTest {
         return idCandidato;
     }
 
-    public String getCandidatoSeleccionadoNombre() {
-        return candidatoSeleccionadoNombre;
-    }
-
     public String getIpMesa() {
         return ipMesa;
+    }
+
+    public String getPuerto() { // Getter para el nuevo atributo
+        return puerto;
     }
 
     public void setDocumentoVotante(String documentoVotante) {
@@ -38,12 +38,12 @@ public class VotoTest {
         this.idCandidato = idCandidato;
     }
 
-    public void setCandidatoSeleccionadoNombre(String candidatoSeleccionadoNombre) {
-        this.candidatoSeleccionadoNombre = candidatoSeleccionadoNombre;
-    }
-
     public void setIpMesa(String ipMesa) {
         this.ipMesa = ipMesa;
+    }
+
+    public void setPuerto(String puerto) { // Setter para el nuevo atributo
+        this.puerto = puerto;
     }
 
     @Override
@@ -51,8 +51,8 @@ public class VotoTest {
         return "VotoTest{" +
                "documentoVotante='" + documentoVotante + '\'' +
                ", idCandidato=" + idCandidato +
-               ", candidatoSeleccionadoNombre='" + candidatoSeleccionadoNombre + '\'' +
                ", ipMesa='" + ipMesa + '\'' +
+               ", puerto='" + puerto + '\'' + // Incluido el nuevo atributo en toString
                '}';
     }
 }

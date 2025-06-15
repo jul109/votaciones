@@ -26,7 +26,7 @@ public class Controlador {
     // Variables para exponer tests de ote station
     private VoteStationImp voteStationServant; // Tu servant
     private ObjectAdapter voteStationAdapter;
-    private final String VOTE_STATION_ADAPTER_ENDPOINT = "default -p 10015";
+    
     private final String VOTE_STATION_IDENTITY = "VoteStation_Mesa";
 
     private final String ACK_ADAPTER_ENDPOINT = "default -p 10014";
@@ -37,6 +37,10 @@ public class Controlador {
 
     //query station
 
+
+    private static final String PUERTO_FILE = "puerto.mesa"; // Archivo para leer el puerto
+    private static int PUERTO_MESA; // Variable para almacenar el puerto leído
+
     
 
     public Controlador() {
@@ -44,7 +48,7 @@ public class Controlador {
         this.candidatosCache = null;
         try {
             MESA_ID = leerMesaIdDesdeArchivo();
-
+            PUERTO_MESA= leerPuertoDesdeArchivo();
         } catch (java.lang.Exception e) {
             System.out.println("Error al leer mesa");
         }
@@ -320,13 +324,17 @@ public class Controlador {
         }
 
         System.out.println("Exposing VoteStation service...");
+
+        String voteStationAdapterEndpoint = "default -p " + PUERTO_MESA; // Usar el puerto leído
         voteStationAdapter = communicator.createObjectAdapterWithEndpoints(
-                "VoteStationAdapter", VOTE_STATION_ADAPTER_ENDPOINT);
+                "VoteStationAdapter", voteStationAdapterEndpoint);
+
+
         this.voteStationServant = new VoteStationImp(this);
         voteStationAdapter.add(this.voteStationServant, Util.stringToIdentity(VOTE_STATION_IDENTITY));
 
         voteStationAdapter.activate();
-        System.out.println("VoteStation service exposed on port " + VOTE_STATION_ADAPTER_ENDPOINT.split("-p ")[1]
+        System.out.println("VoteStation service exposed on port " + PUERTO_MESA
                 + " with identity '" + VOTE_STATION_IDENTITY + "'.");
     }
 
@@ -402,6 +410,20 @@ public class Controlador {
         System.out.println("Verficacion completa....");
         System.out.println(answer);
         return !answer.equals("No está registrado");
+    }
+
+
+    private static int leerPuertoDesdeArchivo() throws IOException, NumberFormatException {
+        int puerto = -1;
+        try (BufferedReader reader = new BufferedReader(new FileReader(PUERTO_FILE))) {
+            String line = reader.readLine();
+            if (line != null) {
+                puerto = Integer.parseInt(line.trim());
+            } else {
+                throw new IOException("El archivo '" + PUERTO_FILE + "' está vacío.");
+            }
+        }
+        return puerto;
     }
 
 }
