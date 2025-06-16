@@ -355,7 +355,7 @@ public class Controlador {
         try {
             System.out.println("REGISTRANDO VOTANTE");
             try {
-                csvManager.registrarVotante(document); // Solo lo marcas si sí llegó
+                
             } catch (java.lang.Exception e) {
                 e.printStackTrace();
             }
@@ -369,15 +369,19 @@ public class Controlador {
                 // long tiempo = MedidorVoto.medirTiempoEnvioVoto(voto, centralizadorRM,
                 // ackProxy);
                 // System.out.println(tiempo);
-//
+                //
                 try {
-                    Thread.sleep(900);
-                    //long tiempo = MedidorVoto.medirTiempoEnvioVoto(voto, centralizadorRM, ackProxy);
-                    
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt(); 
+                    VotoPendiente votoPendiente = new VotoPendiente(MESA_ID, candidateId);
+                    csvManager.agregarVotoPendiente(votoPendiente);
+                    csvManager.registrarVotante(document);
+                    System.out.println(
+                            "Voto de " + document + " para mesa " + MESA_ID + " registrado localmente (ID Voto: "
+                                    + votoPendiente.getId() + ").");
+
+                } catch (IOException e) {
+                    throw new java.lang.Exception("Error al registrar el voto localmente: " + e.getMessage(), e);
                 }
-//
+                //
             } catch (java.lang.Exception e) {
 
                 e.printStackTrace();
